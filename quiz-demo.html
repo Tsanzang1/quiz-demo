@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>培训考试 - 留样管理程序</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { text-align: center; color: #051C2C; margin-bottom: 10px; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .info-form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .info-form label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .info-form input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 18px; color: #051C2C; border-bottom: 2px solid #051C2C; padding-bottom: 8px; margin-bottom: 20px; }
+        .question { margin-bottom: 20px; padding: 15px; background: #fafafa; border-radius: 6px; }
+        .question-text { font-size: 15px; color: #333; margin-bottom: 12px; line-height: 1.6; }
+        .options { padding-left: 10px; }
+        .option { margin-bottom: 8px; }
+        .option label { cursor: pointer; padding: 8px 12px; border-radius: 4px; display: block; transition: background 0.2s; }
+        .option label:hover { background: #e8f4fc; }
+        .option input[type="radio"] { margin-right: 8px; }
+        .fill-blank input { border: none; border-bottom: 2px solid #051C2C; padding: 4px 8px; font-size: 14px; width: 150px; outline: none; background: transparent; }
+        .btn-submit { display: block; width: 100%; padding: 15px; background: #051C2C; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 30px; }
+        .btn-submit:hover { background: #006BA6; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        .result { display: none; }
+        .score-card { text-align: center; padding: 30px; background: linear-gradient(135deg, #051C2C, #006BA6); color: white; border-radius: 12px; margin-bottom: 30px; }
+        .score-number { font-size: 64px; font-weight: bold; margin: 20px 0; }
+        .score-status { font-size: 24px; margin-bottom: 10px; }
+        .score-pass { color: #007A53; }
+        .score-fail { color: #C62828; }
+        .review-section { margin-top: 30px; }
+        .review-item { padding: 15px; margin-bottom: 15px; border-radius: 6px; }
+        .review-correct { background: #e8f5e9; border-left: 4px solid #007A53; }
+        .review-wrong { background: #ffebee; border-left: 4px solid #C62828; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .review-qnum { font-weight: bold; color: #333; }
+        .review-icon { font-size: 20px; }
+        .review-answer { color: #007A53; font-size: 14px; margin-top: 5px; }
+        .review-your { color: #C62828; font-size: 14px; margin-top: 3px; }
+        .source-text { background: #fff; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 13px; color: #666; border: 1px dashed #ccc; }
+        .btn-restart { display: block; width: 100%; padding: 15px; background: #007A53; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quizPage">
+            <h1>📋 培训考试</h1>
+            <p class="subtitle">留样管理程序 | 总分 100 分 | 及格线 80 分</p>
+
+            <div class="info-form">
+                <label>姓名</label>
+                <input type="text" id="name" placeholder="请输入姓名">
+                <label>部门</label>
+                <input type="text" id="department" placeholder="请输入部门">
+            </div>
+
+            <form id="quizForm">
+                <div class="section">
+                    <div class="section-title">一、选择题（每题 4 分，共 40 分）</div>
+                    <div id="mcQuestions"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">二、判断题（每题 4 分，共 40 分）</div>
+                    <div id="tfQuestions"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">三、填空题（每题 4 分，共 20 分）</div>
+                    <div id="fillQuestions"></div>
+                </div>
+                <button type="button" class="btn-submit" onclick="submitQuiz()">提交答卷</button>
+            </form>
+        </div>
+
+        <div id="resultPage" class="result">
+            <h1>📊 考试成绩</h1>
+            <div class="score-card">
+                <div class="score-status" id="scoreStatus"></div>
+                <div class="score-number" id="scoreNumber"></div>
+                <div id="scoreDetail"></div>
+            </div>
+            <div class="review-section" id="reviewSection"></div>
+            <button class="btn-restart" onclick="restartQuiz()">重新答题</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            mc: [
+        {
+                "text": "留样管理的目的是什么？",
+                "options": [
+                        "用于产品质量追溯",
+                        "用于日常检验",
+                        "用于销售备用",
+                        "用于员工培训"
+                ],
+                "answer": "A",
+                "source": "《留样管理程序》第 3.1 条：留样用于产品质量追溯、稳定性考察及不良反应调查。"
+        },
+        {
+                "text": "成品留样数量应至少为全检需求的几倍？",
+                "options": [
+                        "1 倍",
+                        "2 倍",
+                        "3 倍",
+                        "4 倍"
+                ],
+                "answer": "B",
+                "source": "《留样管理程序》第 4.2 条：成品留样数量应至少为全检需要量的 2 倍。"
+        },
+        {
+                "text": "留样观察室的温度要求是？",
+                "options": [
+                        "10-20℃",
+                        "15-25℃",
+                        "20-30℃",
+                        "根据产品储存条件设定"
+                ],
+                "answer": "D",
+                "source": "《留样管理程序》第 5.1 条：留样观察室的储存条件应与产品标签规定的储存条件一致。"
+        },
+        {
+                "text": "留样观察记录应由谁填写？",
+                "options": [
+                        "QC 主任",
+                        "QA 主任",
+                        "留样管理员",
+                        "生产主管"
+                ],
+                "answer": "C",
+                "source": "《留样管理程序》第 6.3 条：留样管理员负责定期观察并填写留样观察记录。"
+        },
+        {
+                "text": "留样期满后的处理方式正确的是？",
+                "options": [
+                        "直接丢弃",
+                        "经批准后按规定销毁",
+                        "转为工作对照品",
+                        "继续保存"
+                ],
+                "answer": "B",
+                "source": "《留样管理程序》第 7.1 条：留样期满后，经质量负责人批准后按规定程序销毁。"
+        },
+        {
+                "text": "原辅料留样应保存至？",
+                "options": [
+                        "产品有效期后 1 年",
+                        "该批物料用完为止",
+                        "产品放行后 2 年",
+                        "产品有效期后 2 年"
+                ],
+                "answer": "A",
+                "source": "《留样管理程序》第 4.1 条：原辅料留样应保存至使用该批物料的成品有效期后 1 年。"
+        },
+        {
+                "text": "稳定性考察留样的观察频次是？",
+                "options": [
+                        "每月 1 次",
+                        "每季度 1 次",
+                        "按稳定性方案规定",
+                        "每半年 1 次"
+                ],
+                "answer": "C",
+                "source": "《留样管理程序》第 5.3 条：稳定性考察留样的观察频次应按批准的稳定性考察方案执行。"
+        },
+        {
+                "text": "留样台账应由哪个部门管理？",
+                "options": [
+                        "生产部",
+                        "QC",
+                        "QA",
+                        "仓储部"
+                ],
+                "answer": "C",
+                "source": "《留样管理程序》第 2.2 条：QA 负责留样台账的建立和管理。"
+        },
+        {
+                "text": "留样包装应与产品包装？",
+                "options": [
+                        "完全不同",
+                        "相同或模拟",
+                        "简易包装即可",
+                        "无要求"
+                ],
+                "answer": "B",
+                "source": "《留样管理程序》第 4.3 条：留样应采用与产品相同或模拟的包装。"
+        },
+        {
+                "text": "留样异常情况的处理流程是？",
+                "options": [
+                        "直接销毁",
+                        "报告 QA 并调查",
+                        "继续观察",
+                        "通知生产部"
+                ],
+                "answer": "B",
+                "source": "《留样管理程序》第 6.5 条：发现留样异常时，应立即报告 QA 并启动偏差调查。"
+        }
+],
+            tf: [
+        {
+                "text": "留样可以代替日常检验使用。",
+                "answer": "错误",
+                "source": "《留样管理程序》第 3.2 条：留样仅用于质量追溯，不得挪作日常检验使用。"
+        },
+        {
+                "text": "留样管理员可以随意调整留样储存条件。",
+                "answer": "错误",
+                "source": "《留样管理程序》第 5.2 条：留样储存条件不得随意变更，确需变更需经质量负责人批准。"
+        },
+        {
+                "text": "留样观察记录应真实、完整、可追溯。",
+                "answer": "正确",
+                "source": "《留样管理程序》第 6.4 条：留样观察记录应真实、完整、可追溯，保存至留样期满后 1 年。"
+        },
+        {
+                "text": "成品留样可以只保留最小包装。",
+                "answer": "错误",
+                "source": "《留样管理程序》第 4.3 条：成品留样应采用与产品相同或模拟的包装，不得仅保留最小包装。"
+        },
+        {
+                "text": "留样期满后必须立即销毁。",
+                "answer": "错误",
+                "source": "《留样管理程序》第 7.1 条：留样期满后，经质量负责人批准后按规定程序销毁，不是立即销毁。"
+        },
+        {
+                "text": "留样台账应包含批号、数量、储存条件等信息。",
+                "answer": "正确",
+                "source": "《留样管理程序》第 2.2 条：留样台账应包含产品名称、批号、数量、储存条件、留样日期等信息。"
+        },
+        {
+                "text": "留样观察发现异常时，可以继续观察等待自行恢复。",
+                "answer": "错误",
+                "source": "《留样管理程序》第 6.5 条：发现留样异常时，应立即报告 QA 并启动偏差调查，不得继续观察等待。"
+        },
+        {
+                "text": "稳定性考察留样不需要定期观察。",
+                "answer": "错误",
+                "source": "《留样管理程序》第 5.3 条：稳定性考察留样应按稳定性方案规定的时间点进行观察和检测。"
+        },
+        {
+                "text": "留样销毁应有记录并可追溯。",
+                "answer": "正确",
+                "source": "《留样管理程序》第 7.2 条：留样销毁应填写销毁记录，包括产品名称、批号、数量、销毁日期、批准人等。"
+        },
+        {
+                "text": "留样管理员可以是 QA 人员兼任。",
+                "answer": "正确",
+                "source": "《留样管理程序》第 2.1 条：QA 负责留样管理，可指定专人负责日常留样管理工作。"
+        }
+],
+            fill: [
+        {
+                "text": "成品留样数量应至少为全检需要量的 ______ 倍。",
+                "answer": "2",
+                "source": "《留样管理程序》第 4.2 条：成品留样数量应至少为全检需要量的 2 倍。"
+        },
+        {
+                "text": "留样储存条件应与产品 ______ 规定的储存条件一致。",
+                "answer": "标签",
+                "source": "《留样管理程序》第 5.1 条：留样观察室的储存条件应与产品标签规定的储存条件一致。"
+        },
+        {
+                "text": "留样观察记录应保存至留样期满后 ______ 年。",
+                "answer": "1",
+                "source": "《留样管理程序》第 6.4 条：留样观察记录保存至留样期满后 1 年。"
+        },
+        {
+                "text": "留样期满后，经 ______ 批准后按规定程序销毁。",
+                "answer": "质量负责人",
+                "source": "《留样管理程序》第 7.1 条：留样期满后，经质量负责人批准后按规定程序销毁。"
+        },
+        {
+                "text": "发现留样异常时，应立即报告 ______ 并启动偏差调查。",
+                "answer": "QA",
+                "source": "《留样管理程序》第 6.5 条：发现留样异常时，应立即报告 QA 并启动偏差调查。"
+        }
+]
+        };
+
+        function renderQuestions() {
+            let mcHtml = '';
+            questions.mc.forEach((q, i) => {
+                mcHtml += `<div class="question">
+                    <div class="question-text">${i+1}. ${q.text}</div>
+                    <div class="options">
+                        ${q.options.map((opt, j) => `<div class="option"><label><input type="radio" name="mc${i}" value="${String.fromCharCode(65+j)}"> ${opt}</label></div>`).join('')}
+                    </div>
+                </div>`;
+            });
+            document.getElementById('mcQuestions').innerHTML = mcHtml;
+
+            let tfHtml = '';
+            questions.tf.forEach((q, i) => {
+                tfHtml += `<div class="question">
+                    <div class="question-text">${i+1}. ${q.text}</div>
+                    <div class="options">
+                        <div class="option"><label><input type="radio" name="tf${i}" value="正确"> 正确</label></div>
+                        <div class="option"><label><input type="radio" name="tf${i}" value="错误"> 错误</label></div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('tfQuestions').innerHTML = tfHtml;
+
+            let fillHtml = '';
+            questions.fill.forEach((q, i) => {
+                const displayText = q.text.replace('______', `<input type="text" id="fill${i}" placeholder="请填写答案">`);
+                fillHtml += `<div class="question">
+                    <div class="question-text">${i+1}. ${displayText}</div>
+                </div>`;
+            });
+            document.getElementById('fillQuestions').innerHTML = fillHtml;
+        }
+
+        function submitQuiz() {
+            const name = document.getElementById('name').value.trim();
+            const department = document.getElementById('department').value.trim();
+            if (!name || !department) { alert('请先填写姓名和部门！'); return; }
+
+            let score = 0, correct = 0, total = questions.mc.length + questions.tf.length + questions.fill.length;
+            let reviews = [];
+
+            questions.mc.forEach((q, i) => {
+                const sel = document.querySelector(`input[name="mc${i}"]:checked`);
+                const ua = sel ? sel.value : '';
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({ type:'选择题', num:i+1, text:q.text, userAnswer:ua||'未作答', correctAnswer:q.answer, isCorrect:ok, source:q.source });
+            });
+
+            questions.tf.forEach((q, i) => {
+                const sel = document.querySelector(`input[name="tf${i}"]:checked`);
+                const ua = sel ? sel.value : '';
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({ type:'判断题', num:i+1, text:q.text, userAnswer:ua||'未作答', correctAnswer:q.answer, isCorrect:ok, source:q.source });
+            });
+
+            questions.fill.forEach((q, i) => {
+                const ua = document.getElementById(`fill${i}`).value.trim();
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({ type:'填空题', num:i+1, text:q.text, userAnswer:ua||'未作答', correctAnswer:q.answer, isCorrect:ok, source:q.source });
+            });
+
+            showResult(name, department, score, correct, total, reviews);
+        }
+
+        function showResult(name, department, score, correct, total, reviews) {
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'block';
+            const pass = score >= 80;
+            document.getElementById('scoreStatus').innerHTML = pass ? '✅ 恭喜通过！' : '❌ 未通过';
+            document.getElementById('scoreStatus').className = pass ? 'score-pass' : 'score-fail';
+            document.getElementById('scoreNumber').textContent = score + ' 分';
+            document.getElementById('scoreDetail').textContent = `${name}（${department}）| 答对 ${correct}/${total} 题`;
+
+            let reviewHtml = '<h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>';
+            reviews.forEach(r => {
+                reviewHtml += `<div class="review-item ${r.isCorrect ? 'review-correct' : 'review-wrong'}">
+                    <div class="review-header">
+                        <span class="review-qnum">${r.type} ${r.num}</span>
+                        <span class="review-icon">${r.isCorrect ? '✅' : '❌'}</span>
+                    </div>
+                    <div style="margin-bottom:8px;">${r.text}</div>
+                    ${!r.isCorrect ? `<div class="review-your">你的答案：${r.userAnswer}</div>` : ''}
+                    <div class="review-answer">正确答案：${r.correctAnswer}</div>
+                    <div class="source-text">📖 源文件原文：${r.source}</div>
+                </div>`;
+            });
+            document.getElementById('reviewSection').innerHTML = reviewHtml;
+        }
+
+        function restartQuiz() {
+            document.getElementById('quizPage').style.display = 'block';
+            document.getElementById('resultPage').style.display = 'none';
+            document.getElementById('quizForm').reset();
+        }
+
+        renderQuestions();
+    </script>
+</body>
+</html>
