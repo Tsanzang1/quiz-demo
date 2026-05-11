@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5%芬苯达唑粉产品质量标准培训考试</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #051c2c, #006ba6); color: white; padding: 30px 20px; text-align: center; border-radius: 12px; margin-bottom: 24px; }
+.header h1 { font-size: 24px; margin-bottom: 8px; }
+.header p { font-size: 14px; opacity: 0.9; }
+.card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.card h2 { color: #051c2c; font-size: 18px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #006ba6; }
+.question { margin-bottom: 20px; padding: 16px; background: #fafbfc; border-radius: 8px; }
+.question p { font-size: 15px; margin-bottom: 10px; font-weight: 500; }
+.options label { display: block; padding: 10px 14px; margin: 6px 0; border: 1px solid #e0e0e0; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.options label:hover { background: #e8f4fd; border-color: #006ba6; }
+.options input[type="radio"] { margin-right: 8px; }
+.tf-options { display: flex; gap: 12px; }
+.tf-options label { flex: 1; text-align: center; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; cursor: pointer; }
+.tf-options label:hover { background: #e8f4fd; }
+.tf-options input[type="radio"] { margin-right: 4px; }
+.fill-input { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-top: 8px; }
+.fill-input:focus { outline: none; border-color: #006ba6; box-shadow: 0 0 0 2px rgba(0,107,166,0.1); }
+.info-form { margin-bottom: 20px; }
+.info-form input { width: 100%; padding: 12px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 15px; margin-bottom: 10px; }
+.info-form input:focus { outline: none; border-color: #006ba6; }
+.btn { display: block; width: 100%; padding: 14px; background: #006ba6; color: white; border: none; border-radius: 8px; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+.btn:hover { background: #005a8a; }
+.btn:disabled { background: #ccc; cursor: not-allowed; }
+.result { text-align: center; padding: 30px; }
+.result .score { font-size: 64px; font-weight: 700; margin: 20px 0; }
+.result .score.pass { color: #007a53; }
+.result .score.fail { color: #c62828; }
+.result .msg { font-size: 18px; margin-bottom: 20px; }
+.detail { text-align: left; margin-top: 20px; }
+.detail .item { padding: 12px; margin: 8px 0; border-radius: 8px; font-size: 14px; }
+.detail .item.correct { background: #e8f5e9; border-left: 4px solid #007a53; }
+.detail .item.wrong { background: #ffebee; border-left: 4px solid #c62828; }
+.detail .item .your-answer { font-weight: 600; }
+.detail .item .correct-answer { color: #007a53; font-weight: 600; }
+.detail .item .source { margin-top: 6px; font-size: 12px; color: #666; background: #f5f5f5; padding: 6px 10px; border-radius: 4px; }
+.hidden { display: none; }
+.section-divider { text-align: center; padding: 12px; color: #666; font-size: 14px; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>5%芬苯达唑粉产品质量标准培训考试</h1>
+<p>文件编码：STP-QS-FE-101-01 | 共25题 | 满分100分 | 及格线80分</p>
+</div>
+
+<div id="formSection" class="card">
+<h2>📝 考生信息</h2>
+<div class="info-form">
+<input type="text" id="name" placeholder="请输入您的姓名" required>
+<input type="text" id="dept" placeholder="请输入您的部门" required>
+</div>
+<button class="btn" onclick="startQuiz()">开始答题</button>
+</div>
+
+<div id="quizSection" class="hidden">
+<div class="card">
+<h2>一、选择题（每题4分，共40分）</h2>
+<div class="question"><p>1. 5%芬苯达唑粉产品质量标准的文件编码是？</p><div class="options"><label><input type="radio" name="mc_1. 5%" value="A"> A. STP-QS-FL-101-01</label><label><input type="radio" name="mc_1. 5%" value="B"> B. STP-QS-FE-101-01</label><label><input type="radio" name="mc_1. 5%" value="C"> C. SOP-QC(FE)-101</label><label><input type="radio" name="mc_1. 5%" value="D"> D. SMP-QA-048</label></div></div><div class="question"><p>2. 5%芬苯达唑粉质量标准依据的是哪版兽药典？</p><div class="options"><label><input type="radio" name="mc_2. 5%" value="A"> A. 中华人民共和国兽药典2015版</label><label><input type="radio" name="mc_2. 5%" value="B"> B. 中华人民共和国兽药典2020版一部</label><label><input type="radio" name="mc_2. 5%" value="C"> C. 中华人民共和国药典2020版</label><label><input type="radio" name="mc_2. 5%" value="D"> D. USP43</label></div></div><div class="question"><p>3. 5%芬苯达唑粉的审核间隔是多久？</p><div class="options"><label><input type="radio" name="mc_3. 5%" value="A"> A. 12个月</label><label><input type="radio" name="mc_3. 5%" value="B"> B. 24个月</label><label><input type="radio" name="mc_3. 5%" value="C"> C. 36个月</label><label><input type="radio" name="mc_3. 5%" value="D"> D. 48个月</label></div></div><div class="question"><p>4. 5%芬苯达唑粉的作用与用途是？</p><div class="options"><label><input type="radio" name="mc_4. 5%" value="A"> A. 抗菌药</label><label><input type="radio" name="mc_4. 5%" value="B"> B. 抗蠕虫药，用于畜禽线虫病和绦虫病</label><label><input type="radio" name="mc_4. 5%" value="C"> C. 解热镇痛药</label><label><input type="radio" name="mc_4. 5%" value="D"> D. 抗病毒药</label></div></div><div class="question"><p>5. 马、牛、羊、猪使用5%芬苯达唑粉的用量是？</p><div class="options"><label><input type="radio" name="mc_5. 马、" value="A"> A. 每1kg体重1~3mg</label><label><input type="radio" name="mc_5. 马、" value="B"> B. 每1kg体重5~7.5mg</label><label><input type="radio" name="mc_5. 马、" value="C"> C. 每1kg体重10~50mg</label><label><input type="radio" name="mc_5. 马、" value="D"> D. 每1kg体重25~50mg</label></div></div><div class="question"><p>6. 禽使用5%芬苯达唑粉的用量是？</p><div class="options"><label><input type="radio" name="mc_6. 禽使" value="A"> A. 每1kg体重5~7.5mg</label><label><input type="radio" name="mc_6. 禽使" value="B"> B. 每1kg体重10~50mg</label><label><input type="radio" name="mc_6. 禽使" value="C"> C. 每1kg体重25~50mg</label><label><input type="radio" name="mc_6. 禽使" value="D"> D. 每1kg体重50~100mg</label></div></div><div class="question"><p>7. 犬、猫使用5%芬苯达唑粉的用量是？</p><div class="options"><label><input type="radio" name="mc_7. 犬、" value="A"> A. 每1kg体重5~7.5mg</label><label><input type="radio" name="mc_7. 犬、" value="B"> B. 每1kg体重10~25mg</label><label><input type="radio" name="mc_7. 犬、" value="C"> C. 每1kg体重25~50mg</label><label><input type="radio" name="mc_7. 犬、" value="D"> D. 每1kg体重50~100mg</label></div></div><div class="question"><p>8. 5%芬苯达唑粉的疗程是？</p><div class="options"><label><input type="radio" name="mc_8. 5%" value="A"> A. 连用1日</label><label><input type="radio" name="mc_8. 5%" value="B"> B. 连用2日</label><label><input type="radio" name="mc_8. 5%" value="C"> C. 连用3日</label><label><input type="radio" name="mc_8. 5%" value="D"> D. 连用5日</label></div></div><div class="question"><p>9. 牛、羊使用5%芬苯达唑粉的休药期是？</p><div class="options"><label><input type="radio" name="mc_9. 牛、" value="A"> A. 3日</label><label><input type="radio" name="mc_9. 牛、" value="B"> B. 7日</label><label><input type="radio" name="mc_9. 牛、" value="C"> C. 14日</label><label><input type="radio" name="mc_9. 牛、" value="D"> D. 28日</label></div></div><div class="question"><p>10. 5%芬苯达唑粉的有效期是？</p><div class="options"><label><input type="radio" name="mc_10. 5" value="A"> A. 1年</label><label><input type="radio" name="mc_10. 5" value="B"> B. 1.5年</label><label><input type="radio" name="mc_10. 5" value="C"> C. 2年</label><label><input type="radio" name="mc_10. 5" value="D"> D. 3年</label></div></div></div>
+<div class="card">
+<h2>二、判断题（每题4分，共40分）</h2>
+<div class="question"><p>11. 5%芬苯达唑粉的检验按照SOP-QC(FE)-101进行。</p><div class="tf-options"><label><input type="radio" name="tf_11. 5" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_11. 5" value="错误"> ❌ 错误</label></div></div><div class="question"><p>12. 供食用的马可以使用5%芬苯达唑粉。</p><div class="tf-options"><label><input type="radio" name="tf_12. 供" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_12. 供" value="错误"> ❌ 错误</label></div></div><div class="question"><p>13. 5%芬苯达唑粉可能伴有致畸胎和胚胎毒性的作用，妊娠前期忌用。</p><div class="tf-options"><label><input type="radio" name="tf_13. 5" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_13. 5" value="错误"> ❌ 错误</label></div></div><div class="question"><p>14. 猪使用5%芬苯达唑粉的休药期是14日。</p><div class="tf-options"><label><input type="radio" name="tf_14. 猪" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_14. 猪" value="错误"> ❌ 错误</label></div></div><div class="question"><p>15. 禽使用5%芬苯达唑粉的休药期是28日。</p><div class="tf-options"><label><input type="radio" name="tf_15. 禽" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_15. 禽" value="错误"> ❌ 错误</label></div></div><div class="question"><p>16. 5%芬苯达唑粉的规格是10%。</p><div class="tf-options"><label><input type="radio" name="tf_16. 5" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_16. 5" value="错误"> ❌ 错误</label></div></div><div class="question"><p>17. 5%芬苯达唑粉的包装规格是25kg/桶。</p><div class="tf-options"><label><input type="radio" name="tf_17. 5" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_17. 5" value="错误"> ❌ 错误</label></div></div><div class="question"><p>18. 5%芬苯达唑粉应遮光、密封、在干燥处保存。</p><div class="tf-options"><label><input type="radio" name="tf_18. 5" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_18. 5" value="错误"> ❌ 错误</label></div></div><div class="question"><p>19. 取样按照SOP-QC-004《成品取样标准操作规程》进行。</p><div class="tf-options"><label><input type="radio" name="tf_19. 取" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_19. 取" value="错误"> ❌ 错误</label></div></div><div class="question"><p>20. 5%芬苯达唑粉的弃奶期是72小时。</p><div class="tf-options"><label><input type="radio" name="tf_20. 5" value="正确"> ✅ 正确</label><label><input type="radio" name="tf_20. 5" value="错误"> ❌ 错误</label></div></div></div>
+<div class="card">
+<h2>三、填空题（每题4分，共20分）</h2>
+<div class="question"><p>21. 5%芬苯达唑粉的内包装为__________，外包装为__________。</p><input type="text" class="fill-input" id="fb_21. 5" placeholder="请输入答案（多个空用分号；隔开）"></div><div class="question"><p>22. 禽使用5%芬苯达唑粉的休药期为__________日，弃蛋期为__________日。</p><input type="text" class="fill-input" id="fb_22. 禽" placeholder="请输入答案（多个空用分号；隔开）"></div><div class="question"><p>23. 不合格时，按__________（SMP-QA-048）和__________（SMP-QA-011）进行调查处理。</p><input type="text" class="fill-input" id="fb_23. 不" placeholder="请输入答案（多个空用分号；隔开）"></div><div class="question"><p>24. 5%芬苯达唑粉的生产日期以芬苯达唑进入__________的时间为准。</p><input type="text" class="fill-input" id="fb_24. 5" placeholder="请输入答案（多个空用分号；隔开）"></div><div class="question"><p>25. 犬或猫内服5%芬苯达唑粉时偶见__________，曾有一例报道出现各类__________减少。</p><input type="text" class="fill-input" id="fb_25. 犬" placeholder="请输入答案（多个空用分号；隔开）"></div></div>
+<button class="btn" onclick="submitQuiz()">提交考卷</button>
+</div>
+
+<div id="resultSection" class="hidden"></div>
+</div>
+
+<script>
+var quizData = {"title": "5%芬苯达唑粉产品质量标准培训考试", "doc": "STP-QS-FE-101-01", "passing_score": 80, "multiple_choice": [{"q": "1. 5%芬苯达唑粉产品质量标准的文件编码是？", "options": ["A. STP-QS-FL-101-01", "B. STP-QS-FE-101-01", "C. SOP-QC(FE)-101", "D. SMP-QA-048"], "answer": "B", "source": "文件编码：STP-QS-FE-101-01"}, {"q": "2. 5%芬苯达唑粉质量标准依据的是哪版兽药典？", "options": ["A. 中华人民共和国兽药典2015版", "B. 中华人民共和国兽药典2020版一部", "C. 中华人民共和国药典2020版", "D. USP43"], "answer": "B", "source": "标准依据：中华人民共和国兽药典2020版一部"}, {"q": "3. 5%芬苯达唑粉的审核间隔是多久？", "options": ["A. 12个月", "B. 24个月", "C. 36个月", "D. 48个月"], "answer": "C", "source": "审核间隔：36个月"}, {"q": "4. 5%芬苯达唑粉的作用与用途是？", "options": ["A. 抗菌药", "B. 抗蠕虫药，用于畜禽线虫病和绦虫病", "C. 解热镇痛药", "D. 抗病毒药"], "answer": "B", "source": "作用与用途：抗蠕虫药。用于畜禽线虫病和绦虫病。"}, {"q": "5. 马、牛、羊、猪使用5%芬苯达唑粉的用量是？", "options": ["A. 每1kg体重1~3mg", "B. 每1kg体重5~7.5mg", "C. 每1kg体重10~50mg", "D. 每1kg体重25~50mg"], "answer": "B", "source": "用法与用量：以芬苯达唑计。内服：一次量，每1kg体重，马、牛、羊、猪5~7.5mg"}, {"q": "6. 禽使用5%芬苯达唑粉的用量是？", "options": ["A. 每1kg体重5~7.5mg", "B. 每1kg体重10~50mg", "C. 每1kg体重25~50mg", "D. 每1kg体重50~100mg"], "answer": "B", "source": "用法与用量：禽10~50mg/kg体重"}, {"q": "7. 犬、猫使用5%芬苯达唑粉的用量是？", "options": ["A. 每1kg体重5~7.5mg", "B. 每1kg体重10~25mg", "C. 每1kg体重25~50mg", "D. 每1kg体重50~100mg"], "answer": "C", "source": "用法与用量：犬、猫25~50mg/kg体重"}, {"q": "8. 5%芬苯达唑粉的疗程是？", "options": ["A. 连用1日", "B. 连用2日", "C. 连用3日", "D. 连用5日"], "answer": "C", "source": "用法与用量：连用3日"}, {"q": "9. 牛、羊使用5%芬苯达唑粉的休药期是？", "options": ["A. 3日", "B. 7日", "C. 14日", "D. 28日"], "answer": "C", "source": "休药期：牛、羊14日"}, {"q": "10. 5%芬苯达唑粉的有效期是？", "options": ["A. 1年", "B. 1.5年", "C. 2年", "D. 3年"], "answer": "C", "source": "有效期：2年"}], "true_false": [{"q": "11. 5%芬苯达唑粉的检验按照SOP-QC(FE)-101进行。", "answer": "正确", "source": "检验方法：按照QC《5%芬苯达唑粉（FE）成品检验标准操作规程》SOP-QC(FE)-101进行检验。"}, {"q": "12. 供食用的马可以使用5%芬苯达唑粉。", "answer": "错误", "source": "注意事项：供食用的马不得使用。"}, {"q": "13. 5%芬苯达唑粉可能伴有致畸胎和胚胎毒性的作用，妊娠前期忌用。", "answer": "正确", "source": "注意事项：可能伴有致畸胎和胚胎毒性的作用，妊娠前期忌用。"}, {"q": "14. 猪使用5%芬苯达唑粉的休药期是14日。", "answer": "错误", "source": "休药期：猪3日。"}, {"q": "15. 禽使用5%芬苯达唑粉的休药期是28日。", "answer": "正确", "source": "休药期：禽28日。"}, {"q": "16. 5%芬苯达唑粉的规格是10%。", "answer": "错误", "source": "规格：5%"}, {"q": "17. 5%芬苯达唑粉的包装规格是25kg/桶。", "answer": "正确", "source": "包装规格：25kg/桶，内包装为双层聚乙烯袋，外包装为纤维纸桶。"}, {"q": "18. 5%芬苯达唑粉应遮光、密封、在干燥处保存。", "answer": "正确", "source": "贮藏：遮光，密封，在干燥处保存。"}, {"q": "19. 取样按照SOP-QC-004《成品取样标准操作规程》进行。", "answer": "正确", "source": "取样：按照QC《成品取样标准操作规程》SOP-QC-004进行取样。"}, {"q": "20. 5%芬苯达唑粉的弃奶期是72小时。", "answer": "错误", "source": "休药期：弃奶期120小时。"}], "fill_blank": [{"q": "21. 5%芬苯达唑粉的内包装为__________，外包装为__________。", "answer": "双层聚乙烯袋；纤维纸桶", "source": "包装规格：25kg/桶，内包装为双层聚乙烯袋，外包装为纤维纸桶。"}, {"q": "22. 禽使用5%芬苯达唑粉的休药期为__________日，弃蛋期为__________日。", "answer": "28；7", "source": "休药期：禽28日；弃蛋期7日。"}, {"q": "23. 不合格时，按__________（SMP-QA-048）和__________（SMP-QA-011）进行调查处理。", "answer": "检验室超标、超趋势检验结果(OOS/OOT)调查处理管理程序；偏差处理管理程序", "source": "不合格时，按《检验室超标、超趋势检验结果(OOS/OOT)调查处理管理程序》（SMP-QA-048）、《偏差处理管理程序》(SMP-QA-011)进行调查处理。"}, {"q": "24. 5%芬苯达唑粉的生产日期以芬苯达唑进入__________的时间为准。", "answer": "混合机", "source": "以芬苯达唑进入混合机的时间为生产日期。"}, {"q": "25. 犬或猫内服5%芬苯达唑粉时偶见__________，曾有一例报道出现各类__________减少。", "answer": "呕吐；白细胞", "source": "犬或猫内服时偶见呕吐，曾有一例报道，犬服药后出现各类白细胞减少。"}]};
+var userInfo = {};
+
+function startQuiz() {
+    var name = document.getElementById('name').value.trim();
+    var dept = document.getElementById('dept').value.trim();
+    if (!name || !dept) { alert('请填写姓名和部门'); return; }
+    userInfo = { name: name, dept: dept };
+    document.getElementById('formSection').classList.add('hidden');
+    document.getElementById('quizSection').classList.remove('hidden');
+    window.scrollTo(0, 0);
+}
+
+function submitQuiz() {
+    var score = 0;
+    var details = [];
+    
+    // Grade multiple choice
+    for (var i = 0; i < quizData.multiple_choice.length; i++) {
+        var q = quizData.multiple_choice[i];
+        var name = 'mc_' + q.q.substring(0, 5);
+        var selected = document.querySelector('input[name="' + name + '"]:checked');
+        var userAns = selected ? selected.value : '未作答';
+        var isCorrect = userAns === q.answer;
+        if (isCorrect) score += 4;
+        details.push({
+            q: q.q,
+            userAnswer: userAns,
+            correctAnswer: q.answer,
+            isCorrect: isCorrect,
+            source: q.source
+        });
+    }
+    
+    // Grade true/false
+    for (var i = 0; i < quizData.true_false.length; i++) {
+        var q = quizData.true_false[i];
+        var name = 'tf_' + q.q.substring(0, 5);
+        var selected = document.querySelector('input[name="' + name + '"]:checked');
+        var userAns = selected ? selected.value : '未作答';
+        var isCorrect = userAns === q.answer;
+        if (isCorrect) score += 4;
+        details.push({
+            q: q.q,
+            userAnswer: userAns,
+            correctAnswer: q.answer,
+            isCorrect: isCorrect,
+            source: q.source
+        });
+    }
+    
+    // Grade fill in blank
+    for (var i = 0; i < quizData.fill_blank.length; i++) {
+        var q = quizData.fill_blank[i];
+        var id = 'fb_' + q.q.substring(0, 5);
+        var userAns = document.getElementById(id).value.trim() || '未作答';
+        var correctAnswers = q.answer.split('；');
+        var userParts = userAns.split(/[；;]/).map(function(s){return s.trim();});
+        var isCorrect = userParts.length === correctAnswers.length && 
+            userParts.every(function(up, idx) { return up === correctAnswers[idx]; });
+        if (isCorrect) score += 4;
+        details.push({
+            q: q.q,
+            userAnswer: userAns,
+            correctAnswer: q.answer,
+            isCorrect: isCorrect,
+            source: q.source
+        });
+    }
+    
+    var pass = score >= quizData.passing_score;
+    var html = '<div class="card result">';
+    html += '<h2>📊 考试成绩</h2>';
+    html += '<div class="score ' + (pass ? 'pass' : 'fail') + '">' + score + '分</div>';
+    html += '<div class="msg">' + (pass ? '🎉 恭喜通过！' : '😔 未通过，请复习后重考') + '</div>';
+    html += '<p>姓名：' + userInfo.name + ' | 部门：' + userInfo.dept + '</p>';
+    html += '<p>及格线：' + quizData.passing_score + '分</p>';
+    html += '</div>';
+    
+    html += '<div class="card"><h2>📋 逐题解析</h2><div class="detail">';
+    for (var i = 0; i < details.length; i++) {
+        var d = details[i];
+        html += '<div class="item ' + (d.isCorrect ? 'correct' : 'wrong') + '">';
+        html += '<p>' + d.q + '</p>';
+        if (!d.isCorrect) {
+            html += '<p>你的答案：<span class="your-answer">' + d.userAnswer + '</span></p>';
+        }
+        html += '<p>正确答案：<span class="correct-answer">' + d.correctAnswer + '</span></p>';
+        html += '<div class="source">📖 源文件原文：' + d.source + '</div>';
+        html += '</div>';
+    }
+    html += '</div></div>';
+    
+    // Send data to Feishu bitable
+    html += '<div class="card"><p style="text-align:center;color:#666;">正在提交成绩...</p></div>';
+    
+    document.getElementById('quizSection').classList.add('hidden');
+    document.getElementById('resultSection').classList.remove('hidden');
+    document.getElementById('resultSection').innerHTML = html;
+    
+    // Prepare data for submission
+    var submitData = {
+        name: userInfo.name,
+        dept: userInfo.dept,
+        score: score,
+        details: details,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Store locally for auto-grading service to pick up
+    try {
+        localStorage.setItem('quiz_submit', JSON.stringify(submitData));
+    } catch(e) {}
+    
+    window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
