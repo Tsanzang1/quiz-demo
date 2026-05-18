@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>答题系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f5f5; min-height: 100vh; }
+        
+        /* 登录页 */
+        .login-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #051C2C, #006BA6); }
+        .login-box { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .login-box h1 { text-align: center; color: #051C2C; margin-bottom: 8px; font-size: 26px; }
+        .login-box .sub { text-align: center; color: #999; margin-bottom: 25px; font-size: 14px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #333; font-weight: bold; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; transition: border 0.2s; }
+        .form-group input:focus { outline: none; border-color: #006BA6; }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .btn-primary { background: #051C2C; color: white; }
+        .btn-primary:hover { background: #006BA6; }
+        .btn-success { background: #007A53; color: white; }
+        .btn-success:hover { background: #005a3e; }
+        .btn-danger { background: #C62828; color: white; }
+        .btn-warning { background: #D46A00; color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; width: auto; display: inline-block; }
+        .error { background: #ffebee; color: #C62828; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+        
+        /* 主页面 */
+        .app { display: none; }
+        .topbar { background: #051C2C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 18px; }
+        .topbar .user-info { font-size: 14px; opacity: 0.9; }
+        .topbar .user-info span { margin-left: 15px; cursor: pointer; }
+        .topbar .user-info span:hover { opacity: 0.7; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #051C2C; margin-bottom: 15px; font-size: 18px; }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #666; }
+        .info-value { color: #333; font-weight: bold; }
+        .status-done { color: #007A53; }
+        .status-pending { color: #D46A00; }
+        .nav-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .nav-btns .btn { flex: 1; text-align: center; text-decoration: none; }
+        
+        /* 答题页 */
+        .question { background: white; border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .q-num { color: #006BA6; font-weight: bold; margin-bottom: 10px; }
+        .q-text { color: #333; font-size: 16px; line-height: 1.6; margin-bottom: 15px; }
+        .options { padding-left: 10px; }
+        .option { margin-bottom: 10px; }
+        .option label { cursor: pointer; padding: 10px 15px; border-radius: 8px; display: block; transition: background 0.2s; border: 1px solid #eee; }
+        .option label:hover { background: #e8f4fc; }
+        .option input { margin-right: 10px; }
+        
+        /* 成绩页 */
+        .score-card { background: linear-gradient(135deg, #051C2C, #006BA6); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 20px; }
+        .score-big { font-size: 64px; font-weight: bold; margin: 15px 0; }
+        .score-detail { font-size: 16px; opacity: 0.9; }
+        .pass { color: #69F0AE; }
+        .fail { color: #FF5252; }
+        .review { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .review-correct { border-left: 4px solid #007A53; }
+        .review-wrong { border-left: 4px solid #C62828; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .review-q { font-weight: bold; color: #333; }
+        .review-icon { font-size: 18px; }
+        .review-text { color: #333; margin-bottom: 8px; }
+        .review-your { color: #C62828; font-size: 14px; }
+        .review-correct-ans { color: #007A53; font-size: 14px; }
+        .review-explain { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 13px; color: #666; }
+        
+        /* 管理后台 */
+        .admin-nav { background: white; display: flex; border-bottom: 2px solid #eee; overflow-x: auto; }
+        .admin-nav a { padding: 12px 18px; text-decoration: none; color: #666; font-size: 14px; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .admin-nav a.active { color: #006BA6; border-bottom-color: #006BA6; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 13px; color: #666; border-bottom: 2px solid #eee; }
+        td { padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        tr:hover { background: #fafafa; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .badge-success { background: #e8f5e9; color: #007A53; }
+        .badge-danger { background: #ffebee; color: #C62828; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; }
+        .modal { background: white; max-width: 600px; margin: 40px auto; padding: 25px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
+        .modal h2 { margin-bottom: 20px; color: #051C2C; }
+        .modal .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; }
+        .ranking-table td { font-size: 14px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stat-card { text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .stat-num { font-size: 28px; font-weight: bold; color: #051C2C; }
+        .stat-label { font-size: 13px; color: #666; margin-top: 5px; }
+        .hidden { display: none; }
+        
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal .form-row { grid-template-columns: 1fr; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页 -->
+    <div class="login-page" id="loginPage">
+        <div class="login-box">
+            <h1>📋 答题系统</h1>
+            <p class="sub">QA 管理程序培训考试</p>
+            <div class="error" id="loginError"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="loginUser" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="loginPass" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn btn-primary">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 应用主体 -->
+    <div class="app" id="app">
+        <!-- 顶部栏 -->
+        <div class="topbar">
+            <h1 id="pageTitle">📋 答题系统</h1>
+            <div class="user-info">
+                <span id="userInfo"></span>
+                <span onclick="logout()">退出</span>
+            </div>
+        </div>
+
+        <!-- 首页 -->
+        <div id="homePage" class="container">
+            <div class="card">
+                <h2>📝 今日答题</h2>
+                <div class="info-row">
+                    <span class="info-label">今日状态</span>
+                    <span class="info-value" id="todayStatus">加载中...</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">题目数量</span>
+                    <span class="info-value">20 题（每题 1 分）</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">题库总量</span>
+                    <span class="info-value" id="totalQ">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">答题规则</span>
+                    <span class="info-value">每天一次，随机抽题</span>
+                </div>
+                <div id="homeActions" style="margin-top:15px;"></div>
+            </div>
+            <div class="nav-btns">
+                <a class="btn btn-primary" onclick="showPage('historyPage'); renderHistory();">📊 历史成绩</a>
+                <a class="btn btn-success hidden" id="adminBtn" onclick="showPage('adminPage'); showAdminNav('questions');">🔧 管理后台</a>
+            </div>
+        </div>
+
+        <!-- 答题页 -->
+        <div id="quizPage" class="container hidden">
+            <div class="card" style="background:#051C2C;color:white;display:flex;justify-content:space-between;align-items:center;">
+                <h1 style="font-size:18px;">📝 答题中</h1>
+                <span onclick="showPage('homePage')" style="cursor:pointer;opacity:0.8;">返回首页</span>
+            </div>
+            <form id="quizForm"></form>
+            <button class="btn btn-primary" onclick="submitQuiz()" style="margin-top:15px;">提交答卷</button>
+        </div>
+
+        <!-- 成绩页 -->
+        <div id="resultPage" class="container hidden">
+            <div class="score-card">
+                <div style="font-size:18px;">📊 考试成绩</div>
+                <div class="score-big" id="resultScore">-</div>
+                <div class="score-detail" id="resultDetail"></div>
+            </div>
+            <h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>
+            <div id="resultReview"></div>
+            <button class="btn btn-success" onclick="showPage('homePage')" style="margin-top:15px;">返回首页</button>
+        </div>
+
+        <!-- 历史成绩页 -->
+        <div id="historyPage" class="container hidden">
+            <div class="card">
+                <h2>📊 历史成绩</h2>
+                <table>
+                    <thead><tr><th>日期</th><th>得分</th><th>正确率</th></tr></thead>
+                    <tbody id="historyTable"></tbody>
+                </table>
+                <p id="historyEmpty" style="color:#999;text-align:center;padding:20px;display:none;">暂无成绩记录</p>
+            </div>
+            <button class="btn btn-primary" onclick="showPage('homePage')">返回首页</button>
+        </div>
+
+        <!-- 管理后台 -->
+        <div id="adminPage" class="hidden">
+            <div class="admin-nav">
+                <a onclick="showAdminNav('questions')" id="navQuestions">📚 题库管理</a>
+                <a onclick="showAdminNav('users')" id="navUsers">👥 用户管理</a>
+                <a onclick="showAdminNav('scores')" id="navScores">📊 成绩记录</a>
+                <a onclick="showAdminNav('ranking')" id="navRanking">🏆 按月排行</a>
+            </div>
+            <div class="container">
+                <!-- 题库管理 -->
+                <div id="adminQuestions">
+                    <div class="card">
+                        <h2>📚 题库管理</h2>
+                        <div class="filter-bar">
+                            <select id="qCategoryFilter" onchange="renderAdminQuestions()"><option value="">全部分类</option></select>
+                            <button class="btn btn-primary btn-sm" onclick="showModal('addQModal')">+ 添加题目</button>
+                        </div>
+                        <table>
+                            <thead><tr><th style="width:40px;">ID</th><th>分类</th><th>题目</th><th style="width:50px;">答案</th><th style="width:120px;">操作</th></tr></thead>
+                            <tbody id="qTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 用户管理 -->
+                <div id="adminUsers" class="hidden">
+                    <div class="card">
+                        <h2>👥 用户管理</h2>
+                        <button class="btn btn-primary btn-sm" onclick="showModal('addUserModal')" style="margin-bottom:15px;">+ 添加用户</button>
+                        <table>
+                            <thead><tr><th>ID</th><th>用户名</th><th>姓名</th><th>部门</th><th>角色</th><th>操作</th></tr></thead>
+                            <tbody id="uTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 成绩记录 -->
+                <div id="adminScores" class="hidden">
+                    <div class="card">
+                        <h2>📊 成绩记录</h2>
+                        <div class="filter-bar">
+                            <input type="text" placeholder="搜索用户名" id="scoreUserFilter" oninput="renderAdminScores()">
+                            <input type="month" id="scoreDateFilter" onchange="renderAdminScores()">
+                        </div>
+                        <table>
+                            <thead><tr><th>用户名</th><th>姓名</th><th>部门</th><th>得分</th><th>日期</th></tr></thead>
+                            <tbody id="sTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 按月排行 -->
+                <div id="adminRanking" class="hidden">
+                    <div class="card">
+                        <h2>🏆 按月成绩排行</h2>
+                        <div class="filter-bar">
+                            <select id="rankingMonth" onchange="renderRanking()"></select>
+                        </div>
+                        <div class="stats-grid" id="rankingStats"></div>
+                        <table class="ranking-table" style="margin-top:15px;">
+                            <thead><tr><th>排名</th><th>姓名</th><th>部门</th><th>答题次数</th><th>总分</th><th>平均分</th></tr></thead>
+                            <tbody id="rankingTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showPage('homePage')" style="margin-top:15px;">返回首页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加题目弹窗 -->
+    <div class="modal-overlay" id="addQModal">
+        <div class="modal">
+            <h2>添加题目</h2>
+            <form onsubmit="addQuestion(event)">
+                <div class="form-group"><label>分类</label><input type="text" id="newQCat" placeholder="如：SMP-QA-015-03 质量危机" required></div>
+                <div class="form-group"><label>题目</label><textarea id="newQText" rows="3" required style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea></div>
+                <div class="form-group"><label>A 选项</label><input type="text" id="newQA" required></div>
+                <div class="form-group"><label>B 选项</label><input type="text" id="newQB" required></div>
+                <div class="form-group"><label>C 选项</label><input type="text" id="newQC" required></div>
+                <div class="form-group"><label>D 选项</label><input type="text" id="newQD" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>正确答案</label><select id="newQAns" required><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+                    <div class="form-group"><label>解析</label><input type="text" id="newQExp"></div>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="hideModal('addQModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑题目弹窗 -->
+    <div class="modal-overlay" id="editQModal">
+        <div class="modal">
+            <h2>编辑题目</h2>
+            <form onsubmit="saveEditQuestion(event)">
+                <input type="hidden" id="editQId">
+                <div class="form-group"><label>分类</label><input type="text" id="editQCat" required></div>
+                <div class="form-group"><label>题目</label><textarea id="editQText" rows="3" required style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;"></textarea></div>
+                <div class="form-group"><label>A</label><input type="text" id="editQA" required></div>
+                <div class="form-group"><label>B</label><input type="text" id="editQB" required></div>
+                <div class="form-group"><label>C</label><input type="text" id="editQC" required></div>
+                <div class="form-group"><label>D</label><input type="text" id="editQD" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>答案</label><select id="editQAns" required><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+                    <div class="form-group"><label>解析</label><input type="text" id="editQExp"></div>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="hideModal('editQModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加用户弹窗 -->
+    <div class="modal-overlay" id="addUserModal">
+        <div class="modal">
+            <h2>添加用户</h2>
+            <form onsubmit="addUser(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>用户名</label><input type="text" id="newUName" required></div>
+                    <div class="form-group"><label>密码</label><input type="text" id="newUPass" value="123456" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>姓名</label><input type="text" id="newUDisplay" required></div>
+                    <div class="form-group"><label>部门</label><input type="text" id="newUDept"></div>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="hideModal('addUserModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    // ==================== 数据存储 ====================
+    const DB = {
+        get(key, def) { try { return JSON.parse(localStorage.getItem('quiz_' + key)) || def; } catch { return def; } },
+        set(key, val) { localStorage.setItem('quiz_' + key, JSON.stringify(val)); },
+        
+        init() {
+            if (!this.get('initialized')) {
+                // 默认管理员
+                this.set('users', [{ id: 1, username: 'admin', password: 'admin123', display_name: '管理员', department: '系统', is_admin: true, active: true }]);
+                // 预置题目
+                this.set('questions', this.getDefaultQuestions());
+                this.set('scores', []);
+                this.set('nextUserId', 2);
+                this.set('nextQId', 24);
+                this.set('initialized', true);
+            }
+        },
+        
+        getDefaultQuestions() {
+            return [
+                { id:1, cat:'SMP-QA-015-03 质量危机', text:'质量危机事项预防和处理管理程序适用于以下哪种情况？', a:'仅产品研发阶段的质量问题', b:'因产品内在质量、标签说明书、产品标准等原因导致药品抽检、监督稽查结果不合格或产品严重不良反应投诉、可能使公司声誉受到严重损害的其它质量投诉', c:'仅生产设备故障', d:'仅员工操作失误', ans:'B', exp:'SMP-QA-015-03，范围1.1', active:true },
+                { id:2, cat:'SMP-QA-015-03 质量危机', text:'质量危机事项预防和处理管理程序的目的是什么？', a:'统计质量事故数量', b:'建立健全应对外部质量危机的应对体系和运行机制，规范和指导应急处理工作，有效预防、积极应对、及时控制质量危机事件的发展，最大限度地降低不良影响和损失，保障公众身体健康与生命安全', c:'考核员工质量意识', d:'降低生产成本', ans:'B', exp:'SMP-QA-015-03，目的2.1', active:true },
+                { id:3, cat:'SMP-QA-015-03 质量危机', text:'以下哪项属于Ⅰ级（特别重大）质量危机？', a:'产品因异物、性状改变等质量问题客户拟向新闻媒体曝光', b:'公司产品涉及政府、新闻媒体通告上市药品存在严重不良反应，药品监管部门予以警告，甚至责令停止生产销售的；临床使用中被认为产品内在质量问题导致出现严重人身伤害事故（如伤残、死亡）的', c:'公司产品出现药品监管部门抽检内在质量不合格或产品标签、说明书违反药品监管法规', d:'其它因产品质量问题或质量投诉可能使丽珠信誉受到损害的', ans:'B', exp:'SMP-QA-015-03，定义4.1', active:true },
+                { id:4, cat:'SMP-QA-015-03 质量危机', text:'以下哪项属于Ⅱ级（重大）质量危机？', a:'临床使用中被认为产品内在质量问题导致出现严重人身伤害事故', b:'公司产品出现药品监管部门抽检内在质量不合格或产品标签、说明书违反药品监管法规，可能被药品监管部门、新闻媒体通报、公告，可能使公司信誉受到严重损害的', c:'产品因异物、性状改变等质量问题客户拟向新闻媒体曝光', d:'仅内部检验不合格', ans:'B', exp:'SMP-QA-015-03，定义4.2', active:true },
+                { id:5, cat:'SMP-QA-015-03 质量危机', text:'质量危机应急工作的组织原则是？', a:'仅由生产管理部负责', b:'统一领导，分工负责。公司QA组织实施本应急预案，对应急工作进行布置、指挥和协调', c:'仅由QC部负责', d:'仅由总经理个人负责', ans:'B', exp:'SMP-QA-015-03，程序6.1.1', active:true },
+                { id:6, cat:'SMP-QA-015-03 质量危机', text:'Ⅰ级质量危机发生后，信息接收人员应立即向谁报告？', a:'仅向部门主管报告', b:'立即口头向质量管理负责人报告', c:'仅向QA专员报告', d:'仅向生产管理负责人报告', ans:'B', exp:'SMP-QA-015-03，程序6.3.2.1', active:true },
+                { id:7, cat:'SMP-QA-015-03 质量危机', text:'Ⅰ级质量危机发生后，质量管理负责人应在多长时间内向总经理报告？', a:'立即', b:'2小时内', c:'4小时内', d:'24小时内', ans:'B', exp:'SMP-QA-015-03，程序6.3.2.1', active:true },
+                { id:8, cat:'SMP-QA-015-03 质量危机', text:'Ⅰ级质量危机发生后，应在多长时间内填报《危机事项报告表》QR1-SMP-QA-015？', a:'2小时内', b:'12小时内', c:'24小时内', d:'48小时内', ans:'C', exp:'SMP-QA-015-03，程序6.3.2.2', active:true },
+                { id:9, cat:'SMP-QA-015-03 质量危机', text:'Ⅰ级质量危机响应启动后，各相关部门应在多长时间内进入应急状态？', a:'立即', b:'1小时内', c:'2小时内', d:'4小时内', ans:'C', exp:'SMP-QA-015-03，程序6.3.2.4', active:true },
+                { id:10, cat:'SMP-QA-015-03 质量危机', text:'Ⅱ级质量危机实行什么报告制度？', a:'每日一报', b:'每周一报', c:'每月一报', d:'每季度一报', ans:'B', exp:'SMP-QA-015-03，程序6.3.3.3', active:true },
+                { id:11, cat:'SMP-QA-003-12 记录管理', text:'记录管理程序适用于什么范围？', a:'仅生产记录', b:'仅检验记录', c:'公司所有记录的管理工作', d:'仅质量记录', ans:'C', exp:'SMP-QA-003-12，范围1.1', active:true },
+                { id:12, cat:'SMP-QA-003-12 记录管理', text:'记录管理程序的目的是什么？', a:'统计记录数量', b:'建立记录管理程序，使与生产有关的每项活动均应有记录，记录数据应完整可靠，使记录填写符合GMP的要求，以保证产品生产、质量控制和质量保证、包装所赋电子追溯码等活动可追溯', c:'考核员工书写能力', d:'降低纸张成本', ans:'B', exp:'SMP-QA-003-12，目的2.1', active:true },
+                { id:13, cat:'SMP-QA-003-12 记录管理', text:'根据记录管理程序，谁负责编制/修订本程序？', a:'QC部', b:'生产管理部', c:'QA', d:'各车间', ans:'C', exp:'SMP-QA-003-12，职责3.1', active:true },
+                { id:14, cat:'SMP-QA-003-12 记录管理', text:'经审批的记录原件应存放于哪里？', a:'使用部门', b:'生产管理部', c:'质量保证部（QA），原件专柜保管', d:'档案室', ans:'C', exp:'SMP-QA-003-12，程序6.1', active:true },
+                { id:15, cat:'SMP-QA-003-12 记录管理', text:'记录填写应使用什么笔？', a:'铅笔', b:'红色签字笔', c:'黑色中性笔', d:'圆珠笔', ans:'C', exp:'SMP-QA-003-12，程序6.4.1', active:true },
+                { id:16, cat:'SMP-QA-003-12 记录管理', text:'辅助记录由谁发放？', a:'各车间自行打印', b:'QA人员按需发放空白记录盖记录受控章和发放流水号', c:'采购部', d:'生产管理部', ans:'B', exp:'SMP-QA-003-12，程序6.3.2', active:true },
+                { id:17, cat:'SMP-QA-003-12 记录管理', text:'按月填写的记录应在多长时间内完成归档？', a:'当月内', b:'次月5个工作日内', c:'次月10个工作日内', d:'次月15个工作日内', ans:'B', exp:'SMP-QA-003-12，程序6.3.4.3', active:true },
+                { id:18, cat:'SMP-QA-003-12 记录管理', text:'辅助记录分为哪几类？', a:'仅2类', b:'按月填写的记录、连续性的记录、完结性的记录、按计划填写的记录', c:'仅3类', d:'生产记录和检验记录', ans:'B', exp:'SMP-QA-003-12，程序6.3.4.1', active:true },
+                { id:19, cat:'SMP-QA-003-12 记录管理', text:'连续性记录的归档要求是什么？', a:'按年归档', b:'按月归档，在次月初5个工作日内完成上个月记录的归档；如填写周期不足2次/月的，按年归档，在次年初5个工作日内完成上个月记录的归档', c:'无需归档', d:'随时归档', ans:'B', exp:'SMP-QA-003-12，程序6.3.4.3', active:true },
+                { id:20, cat:'SMP-QA-003-12 记录管理', text:'记录制订时，如果没有特殊要求，应尽量使用什么格式？', a:'A3格式', b:'A4格式', c:'B5格式', d:'自定义格式', ans:'B', exp:'SMP-QA-003-12，程序6.1', active:true },
+                { id:21, cat:'SMP-QA-005-12 状态标识', text:'状态标识管理程序适用于哪些对象？', a:'仅成品', b:'仅物料', c:'物料、中间体、成品、厂房、仪器、设备、管道、计量标识等', d:'仅检验样品', ans:'C', exp:'SMP-QA-005-12，范围1.1', active:true },
+                { id:22, cat:'SMP-QA-005-12 状态标识', text:'状态标识管理程序的目的是什么？', a:'美化生产环境', b:'防止产品在生产过程中有混淆、差错、污染等质量事故的发生，并保证仪器、设备的正确操作，避免安全事故的发生', c:'统计标识数量', d:'降低标识成本', ans:'B', exp:'SMP-QA-005-12，目的2.1', active:true },
+                { id:23, cat:'SMP-QA-005-12 状态标识', text:'谁负责所有标识牌的采购工作？', a:'QA', b:'生产管理部', c:'采购部', d:'各车间', ans:'C', exp:'SMP-QA-005-12，职责3.2', active:true }
+            ];
+        }
+    };
+
+    // ==================== 全局状态 ====================
+    let currentUser = null;
+    let currentQuiz = [];
+
+    // ==================== 页面切换 ====================
+    function showPage(id) {
+        ['homePage','quizPage','resultPage','historyPage','adminPage'].forEach(p => {
+            document.getElementById(p).classList.add('hidden');
+        });
+        document.getElementById(id).classList.remove('hidden');
+        
+        if (id === 'homePage') renderHome();
+        if (id === 'adminPage') {
+            document.getElementById('adminPage').classList.remove('hidden');
+        }
+    }
+
+    function showAdminNav(tab) {
+        ['questions','users','scores','ranking'].forEach(t => {
+            document.getElementById('admin' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('hidden');
+            document.getElementById('nav' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('active');
+        });
+        document.getElementById('admin' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+        document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+        
+        if (tab === 'questions') renderAdminQuestions();
+        if (tab === 'users') renderAdminUsers();
+        if (tab === 'scores') renderAdminScores();
+        if (tab === 'ranking') renderRanking();
+    }
+
+    function showModal(id) { document.getElementById(id).style.display = 'block'; }
+    function hideModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // ==================== 登录 ====================
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('loginUser').value.trim();
+        const password = document.getElementById('loginPass').value;
+        
+        const users = DB.get('users');
+        const user = users.find(u => u.username === username && u.password === password && u.active !== false);
+        
+        if (!user) {
+            const err = document.getElementById('loginError');
+            err.textContent = '用户名或密码错误';
+            err.style.display = 'block';
+            return;
+        }
+        
+        currentUser = user;
+        DB.set('currentUser', user);
+        enterApp();
+    });
+
+    function enterApp() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('userInfo').innerHTML = currentUser.display_name + '（' + currentUser.department + '）';
+        
+        if (currentUser.is_admin) {
+            document.getElementById('adminBtn').classList.remove('hidden');
+        }
+        
+        showPage('homePage');
+    }
+
+    function logout() {
+        currentUser = null;
+        DB.set('currentUser', null);
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('loginForm').reset();
+        document.getElementById('loginError').style.display = 'none';
+    }
+
+    // ==================== 首页 ====================
+    function renderHome() {
+        const today = new Date().toISOString().split('T')[0];
+        const scores = DB.get('scores');
+        const todayScore = scores.find(s => s.userId === currentUser.id && s.date === today);
+        const questions = DB.get('questions').filter(q => q.active !== false);
+        
+        document.getElementById('totalQ').textContent = questions.length + ' 题';
+        
+        const statusEl = document.getElementById('todayStatus');
+        const actionsEl = document.getElementById('homeActions');
+        
+        if (todayScore) {
+            statusEl.innerHTML = '<span class="status-done">✅ 已完成（' + todayScore.score + '分）</span>';
+            actionsEl.innerHTML = '<button class="btn btn-primary" disabled style="opacity:0.5;">今日已答题</button>';
+        } else {
+            statusEl.innerHTML = '<span class="status-pending">⏳ 待答题</span>';
+            actionsEl.innerHTML = '<button class="btn btn-primary" onclick="startQuiz()">开始答题</button>';
+        }
+    }
+
+    // ==================== 答题 ====================
+    function startQuiz() {
+        const questions = DB.get('questions').filter(q => q.active !== false);
+        if (questions.length < 20) {
+            alert('题库题目不足20道，当前只有 ' + questions.length + ' 道');
+            return;
+        }
+        
+        // 随机选20题
+        const shuffled = [...questions].sort(() => Math.random() - 0.5);
+        currentQuiz = shuffled.slice(0, 20);
+        
+        let html = '';
+        currentQuiz.forEach((q, i) => {
+            html += `<div class="question">
+                <div class="q-num">第 ${i+1} 题</div>
+                <div class="q-text">${q.text}</div>
+                <div class="options">
+                    <div class="option"><label><input type="radio" name="q${q.id}" value="A"> A. ${q.a}</label></div>
+                    <div class="option"><label><input type="radio" name="q${q.id}" value="B"> B. ${q.b}</label></div>
+                    <div class="option"><label><input type="radio" name="q${q.id}" value="C"> C. ${q.c}</label></div>
+                    <div class="option"><label><input type="radio" name="q${q.id}" value="D"> D. ${q.d}</label></div>
+                </div>
+            </div>`;
+        });
+        
+        document.getElementById('quizForm').innerHTML = html;
+        showPage('quizPage');
+    }
+
+    function submitQuiz() {
+        // 检查是否全部作答
+        let allAnswered = true;
+        let correct = 0;
+        let results = [];
+        
+        currentQuiz.forEach(q => {
+            const sel = document.querySelector(`input[name="q${q.id}"]:checked`);
+            if (!sel) { allAnswered = false; return; }
+            const ans = sel.value;
+            const isCorrect = ans === q.ans;
+            if (isCorrect) correct++;
+            results.push({
+                id: q.id, num: results.length + 1,
+                text: q.text, userAnswer: ans, correctAnswer: q.ans,
+                isCorrect: isCorrect, exp: q.exp
+            });
+        });
+        
+        if (!allAnswered) {
+            alert('请回答所有题目！');
+            return;
+        }
+        
+        // 保存成绩
+        const scores = DB.get('scores');
+        const today = new Date().toISOString().split('T')[0];
+        scores.push({
+            id: scores.length + 1,
+            userId: currentUser.id,
+            username: currentUser.username,
+            displayName: currentUser.display_name,
+            department: currentUser.department,
+            total: 20, correct: correct,
+            score: correct,
+            date: today,
+            time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})
+        });
+        DB.set('scores', scores);
+        
+        // 显示成绩
+        document.getElementById('resultScore').textContent = correct + ' / 20';
+        const pass = correct >= 16;
+        document.getElementById('resultDetail').innerHTML = `答对 ${correct}/20 题 ${pass ? '<span class="pass">✅ 通过（及格线 16分）</span>' : '<span class="fail">❌ 未通过（及格线 16分）</span>'}`;
+        
+        let reviewHtml = '';
+        results.forEach(r => {
+            reviewHtml += `<div class="review ${r.isCorrect ? 'review-correct' : 'review-wrong'}">
+                <div class="review-header">
+                    <span class="review-q">第 ${r.num} 题</span>
+                    <span class="review-icon">${r.isCorrect ? '✅' : '❌'}</span>
+                </div>
+                <div class="review-text">${r.text}</div>
+                ${!r.isCorrect ? `<div class="review-your">你的答案：${r.userAnswer}</div>` : ''}
+                <div class="review-correct-ans">正确答案：${r.correctAnswer}</div>
+                ${r.exp ? `<div class="review-explain">📖 ${r.exp}</div>` : ''}
+            </div>`;
+        });
+        document.getElementById('resultReview').innerHTML = reviewHtml;
+        
+        showPage('resultPage');
+    }
+
+    // ==================== 历史成绩 ====================
+    function renderHistory() {
+        const scores = DB.get('scores').filter(s => s.userId === currentUser.id).reverse();
+        const table = document.getElementById('historyTable');
+        const empty = document.getElementById('historyEmpty');
+        
+        if (scores.length === 0) {
+            table.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        
+        empty.style.display = 'none';
+        table.innerHTML = scores.map(s => `<tr>
+            <td>${s.date} ${s.time}</td>
+            <td><strong>${s.score}</strong> / ${s.total}</td>
+            <td>${Math.round(s.score/s.total*100)}%</td>
+        </tr>`).join('');
+    }
+
+    // ==================== 管理后台 - 题库 ====================
+    function renderAdminQuestions() {
+        const questions = DB.get('questions');
+        const filter = document.getElementById('qCategoryFilter').value;
+        const filtered = filter ? questions.filter(q => q.cat === filter && q.active !== false) : questions.filter(q => q.active !== false);
+        
+        // 更新分类下拉
+        const cats = [...new Set(questions.filter(q => q.active !== false).map(q => q.cat))];
+        const catSelect = document.getElementById('qCategoryFilter');
+        const currentVal = catSelect.value;
+        catSelect.innerHTML = '<option value="">全部分类</option>' + cats.map(c => `<option value="${c}" ${c===currentVal?'selected':''}>${c}</option>`).join('');
+        
+        document.getElementById('qTable').innerHTML = filtered.map(q => `<tr>
+            <td>${q.id}</td>
+            <td><span class="badge badge-success">${q.cat}</span></td>
+            <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${q.text}</td>
+            <td><strong>${q.ans}</strong></td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editQuestion(${q.id})">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteQuestion(${q.id})">删除</button>
+            </td>
+        </tr>`).join('');
+    }
+
+    function addQuestion(e) {
+        e.preventDefault();
+        const questions = DB.get('questions');
+        let nextId = DB.get('nextQId', 1);
+        questions.push({
+            id: nextId,
+            cat: document.getElementById('newQCat').value,
+            text: document.getElementById('newQText').value,
+            a: document.getElementById('newQA').value,
+            b: document.getElementById('newQB').value,
+            c: document.getElementById('newQC').value,
+            d: document.getElementById('newQD').value,
+            ans: document.getElementById('newQAns').value,
+            exp: document.getElementById('newQExp').value,
+            active: true
+        });
+        DB.set('questions', questions);
+        DB.set('nextQId', nextId + 1);
+        hideModal('addQModal');
+        renderAdminQuestions();
+        e.target.reset();
+    }
+
+    function editQuestion(id) {
+        const q = DB.get('questions').find(x => x.id === id);
+        if (!q) return;
+        document.getElementById('editQId').value = q.id;
+        document.getElementById('editQCat').value = q.cat;
+        document.getElementById('editQText').value = q.text;
+        document.getElementById('editQA').value = q.a;
+        document.getElementById('editQB').value = q.b;
+        document.getElementById('editQC').value = q.c;
+        document.getElementById('editQD').value = q.d;
+        document.getElementById('editQAns').value = q.ans;
+        document.getElementById('editQExp').value = q.exp || '';
+        showModal('editQModal');
+    }
+
+    function saveEditQuestion(e) {
+        e.preventDefault();
+        const id = parseInt(document.getElementById('editQId').value);
+        const questions = DB.get('questions');
+        const q = questions.find(x => x.id === id);
+        if (q) {
+            q.cat = document.getElementById('editQCat').value;
+            q.text = document.getElementById('editQText').value;
+            q.a = document.getElementById('editQA').value;
+            q.b = document.getElementById('editQB').value;
+            q.c = document.getElementById('editQC').value;
+            q.d = document.getElementById('editQD').value;
+            q.ans = document.getElementById('editQAns').value;
+            q.exp = document.getElementById('editQExp').value;
+            DB.set('questions', questions);
+        }
+        hideModal('editQModal');
+        renderAdminQuestions();
+    }
+
+    function deleteQuestion(id) {
+        if (!confirm('确定删除此题？')) return;
+        const questions = DB.get('questions');
+        const q = questions.find(x => x.id === id);
+        if (q) { q.active = false; DB.set('questions', questions); }
+        renderAdminQuestions();
+    }
+
+    // ==================== 管理后台 - 用户 ====================
+    function renderAdminUsers() {
+        const users = DB.get('users');
+        document.getElementById('uTable').innerHTML = users.map(u => `<tr>
+            <td>${u.id}</td>
+            <td>${u.username}</td>
+            <td>${u.display_name}</td>
+            <td>${u.department || '-'}</td>
+            <td>${u.is_admin ? '<span class="badge badge-danger">管理员</span>' : '<span class="badge badge-success">普通用户</span>'}</td>
+            <td>
+                ${!u.is_admin ? `<button class="btn btn-sm btn-warning" onclick="toggleUser(${u.id})">${u.active === false ? '启用' : '禁用'}</button>` : ''}
+                ${!u.is_admin ? `<button class="btn btn-sm btn-primary" onclick="resetPassword(${u.id})">重置密码</button>` : ''}
+            </td>
+        </tr>`).join('');
+    }
+
+    function addUser(e) {
+        e.preventDefault();
+        const users = DB.get('users');
+        let nextId = DB.get('nextUserId', 2);
+        const username = document.getElementById('newUName').value.trim();
+        if (users.find(u => u.username === username)) {
+            alert('用户名已存在');
+            return;
+        }
+        users.push({
+            id: nextId,
+            username: username,
+            password: document.getElementById('newUPass').value,
+            display_name: document.getElementById('newUDisplay').value,
+            department: document.getElementById('newUDept').value,
+            is_admin: false,
+            active: true
+        });
+        DB.set('users', users);
+        DB.set('nextUserId', nextId + 1);
+        hideModal('addUserModal');
+        renderAdminUsers();
+        e.target.reset();
+    }
+
+    function toggleUser(id) {
+        const users = DB.get('users');
+        const u = users.find(x => x.id === id);
+        if (u) { u.active = u.active === false ? true : false; DB.set('users', users); }
+        renderAdminUsers();
+    }
+
+    function resetPassword(id) {
+        if (!confirm('确定重置密码为 123456？')) return;
+        const users = DB.get('users');
+        const u = users.find(x => x.id === id);
+        if (u) { u.password = '123456'; DB.set('users', users); }
+        renderAdminUsers();
+    }
+
+    // ==================== 管理后台 - 成绩 ====================
+    function renderAdminScores() {
+        const scores = DB.get('scores');
+        const userFilter = document.getElementById('scoreUserFilter').value.toLowerCase();
+        const dateFilter = document.getElementById('scoreDateFilter').value;
+        
+        let filtered = scores;
+        if (userFilter) filtered = filtered.filter(s => s.username.toLowerCase().includes(userFilter) || s.displayName.toLowerCase().includes(userFilter));
+        if (dateFilter) filtered = filtered.filter(s => s.date.startsWith(dateFilter));
+        
+        filtered.reverse();
+        document.getElementById('sTable').innerHTML = filtered.map(s => `<tr>
+            <td>${s.username}</td>
+            <td>${s.displayName}</td>
+            <td>${s.department || '-'}</td>
+            <td><strong>${s.score}</strong> / ${s.total}</td>
+            <td>${s.date} ${s.time || ''}</td>
+        </tr>`).join('');
+    }
+
+    // ==================== 管理后台 - 排行 ====================
+    function renderRanking() {
+        const scores = DB.get('scores');
+        const monthSelect = document.getElementById('rankingMonth');
+        
+        // 获取所有月份
+        const months = [...new Set(scores.map(s => s.date.substring(0, 7)))].sort().reverse();
+        const currentMonth = monthSelect.value || new Date().toISOString().substring(0, 7);
+        monthSelect.innerHTML = months.map(m => `<option value="${m}" ${m===currentMonth?'selected':''}>${m}</option>`).join('');
+        if (!months.includes(currentMonth) && months.length > 0) {
+            monthSelect.value = months[0];
+        }
+        
+        const selectedMonth = monthSelect.value;
+        const monthScores = scores.filter(s => s.date.startsWith(selectedMonth));
+        
+        // 按用户分组统计
+        const userStats = {};
+        monthScores.forEach(s => {
+            if (!userStats[s.userId]) {
+                userStats[s.userId] = { userId: s.userId, username: s.username, displayName: s.displayName, department: s.department, count: 0, total: 0, correct: 0 };
+            }
+            userStats[s.userId].count++;
+            userStats[s.userId].total += s.total;
+            userStats[s.userId].correct += s.correct;
+        });
+        
+        const ranking = Object.values(userStats).map(u => ({
+            ...u,
+            totalScore: u.correct,
+            avgScore: (u.correct / u.count).toFixed(1)
+        })).sort((a, b) => b.totalScore - a.totalScore || b.avgScore - a.avgScore);
+        
+        // 统计卡片
+        const totalUsers = ranking.length;
+        const totalQuizzes = ranking.reduce((s, u) => s + u.count, 0);
+        const totalScores = ranking.reduce((s, u) => s + u.totalScore, 0);
+        const avgScore = totalUsers > 0 ? (totalScores / totalQuizzes).toFixed(1) : 0;
+        
+        document.getElementById('rankingStats').innerHTML = `
+            <div class="stat-card"><div class="stat-num">${totalUsers}</div><div class="stat-label">参与人数</div></div>
+            <div class="stat-card"><div class="stat-num">${totalQuizzes}</div><div class="stat-label">答题次数</div></div>
+            <div class="stat-card"><div class="stat-num">${totalScores}</div><div class="stat-label">总得分</div></div>
+            <div class="stat-card"><div class="stat-num">${avgScore}</div><div class="stat-label">平均分数</div></div>
+        `;
+        
+        document.getElementById('rankingTable').innerHTML = ranking.length === 0 
+            ? '<tr><td colspan="6" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>'
+            : ranking.map((r, i) => `<tr>
+                <td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td>
+                <td>${r.displayName}</td>
+                <td>${r.department || '-'}</td>
+                <td>${r.count}</td>
+                <td><strong>${r.totalScore}</strong></td>
+                <td><strong>${r.avgScore}</strong></td>
+            </tr>`).join('');
+    }
+
+    // ==================== 初始化 ====================
+    DB.init();
+    
+    // 检查是否已登录
+    const savedUser = DB.get('currentUser');
+    if (savedUser && savedUser.username) {
+        // 验证用户是否仍然存在且启用
+        const users = DB.get('users');
+        const user = users.find(u => u.id === savedUser.id && u.active !== false);
+        if (user) {
+            currentUser = user;
+            enterApp();
+        } else {
+            logout();
+        }
+    }
+    </script>
+</body>
+</html>
