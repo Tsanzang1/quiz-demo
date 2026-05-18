@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>培训考试 - QA三项管理程序</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { text-align: center; color: #051C2C; margin-bottom: 10px; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .info-form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .info-form label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .info-form input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 18px; color: #051C2C; border-bottom: 2px solid #051C2C; padding-bottom: 8px; margin-bottom: 20px; }
+        .question { margin-bottom: 20px; padding: 15px; background: #fafafa; border-radius: 6px; }
+        .question-text { font-size: 15px; color: #333; margin-bottom: 12px; line-height: 1.6; }
+        .options { padding-left: 10px; }
+        .option { margin-bottom: 8px; }
+        .option label { cursor: pointer; padding: 8px 12px; border-radius: 4px; display: block; transition: background 0.2s; }
+        .option label:hover { background: #e8f4fc; }
+        .option input[type="radio"] { margin-right: 8px; }
+        .btn-submit { display: block; width: 100%; padding: 15px; background: #051C2C; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 30px; }
+        .btn-submit:hover { background: #006BA6; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        .result { display: none; }
+        .score-card { text-align: center; padding: 30px; background: linear-gradient(135deg, #051C2C, #006BA6); color: white; border-radius: 12px; margin-bottom: 30px; }
+        .score-number { font-size: 64px; font-weight: bold; margin: 20px 0; }
+        .score-status { font-size: 24px; margin-bottom: 10px; }
+        .score-pass { color: #007A53; }
+        .score-fail { color: #C62828; }
+        .review-section { margin-top: 30px; }
+        .review-item { padding: 15px; margin-bottom: 15px; border-radius: 6px; }
+        .review-correct { background: #e8f5e9; border-left: 4px solid #007A53; }
+        .review-wrong { background: #ffebee; border-left: 4px solid #C62828; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .review-qnum { font-weight: bold; color: #333; }
+        .review-icon { font-size: 20px; }
+        .review-answer { color: #007A53; font-size: 14px; margin-top: 5px; }
+        .review-your { color: #C62828; font-size: 14px; margin-top: 3px; }
+        .source-text { background: #fff; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 13px; color: #666; border: 1px dashed #ccc; }
+        .btn-restart { display: block; width: 100%; padding: 15px; background: #007A53; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quizPage">
+            <h1>📋 培训考试</h1>
+            <p class="subtitle">QA三项管理程序 | 总分 92 分 | 及格线 73 分</p>
+
+            <div class="info-form">
+                <label>姓名</label>
+                <input type="text" id="name" placeholder="请输入姓名">
+                <label>部门</label>
+                <input type="text" id="department" placeholder="请输入部门">
+            </div>
+
+            <form id="quizForm">
+                <div class="section">
+                    <div class="section-title">一、质量危机事项预防和处理管理程序（SMP-QA-015-03）</div>
+                    <div id="section1"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">二、记录管理程序（SMP-QA-003-12）</div>
+                    <div id="section2"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">三、状态标识管理程序（SMP-QA-005-12）</div>
+                    <div id="section3"></div>
+                </div>
+                <button type="button" class="btn-submit" onclick="submitQuiz()">提交答卷</button>
+            </form>
+        </div>
+
+        <div id="resultPage" class="result">
+            <h1>📊 考试成绩</h1>
+            <div class="score-card">
+                <div class="score-status" id="scoreStatus"></div>
+                <div class="score-number" id="scoreNumber"></div>
+                <div id="scoreDetail"></div>
+            </div>
+            <div class="review-section" id="reviewSection"></div>
+            <button class="btn-restart" onclick="restartQuiz()">重新答题</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+        {
+                "text": "质量危机事项预防和处理管理程序适用于以下哪种情况？",
+                "options": [
+                        "仅产品研发阶段的质量问题",
+                        "因产品内在质量、标签说明书、产品标准等原因导致药品抽检、监督稽查结果不合格或产品严重不良反应投诉、可能使公司声誉受到严重损害的其它质量投诉",
+                        "仅生产设备故障",
+                        "仅员工操作失误"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，范围1.1：因产品内在质量、标签说明书、产品标准等原因导致药品抽检、监督稽查结果不合格或产品严重不良反应投诉、可能使公司声誉受到严重损害的其它质量投诉，适用本应急预案。"
+        },
+        {
+                "text": "质量危机事项预防和处理管理程序的目的是什么？",
+                "options": [
+                        "统计质量事故数量",
+                        "建立健全应对外部质量危机的应对体系和运行机制，规范和指导应急处理工作，有效预防、积极应对、及时控制质量危机事件的发展，最大限度地降低不良影响和损失，保障公众身体健康与生命安全",
+                        "考核员工质量意识",
+                        "降低生产成本"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，目的2.1：建立健全应对外部质量危机的应对体系和运行机制，规范和指导应急处理工作，有效预防、积极应对、及时控制质量危机事件的发展，最大限度地降低不良影响和损失，保障公众身体健康与生命安全。"
+        },
+        {
+                "text": "以下哪项属于Ⅰ级（特别重大）质量危机？",
+                "options": [
+                        "产品因异物、性状改变等质量问题客户拟向新闻媒体曝光",
+                        "公司产品涉及政府、新闻媒体通告上市药品存在严重不良反应，药品监管部门予以警告，甚至责令停止生产销售的；临床使用中被认为产品内在质量问题导致出现严重人身伤害事故（如伤残、死亡）的",
+                        "公司产品出现药品监管部门抽检内在质量不合格或产品标签、说明书违反药品监管法规",
+                        "其它因产品质量问题或质量投诉可能使丽珠信誉受到损害的"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，定义4.1：Ⅰ级（特别重大质量危机）：公司产品涉及政府、新闻媒体通告上市药品存在严重不良反应，药品监管部门予以警告，甚至责令停止生产销售的；临床使用中被认为产品内在质量问题导致出现严重人身伤害事故（如伤残、死亡）的。"
+        },
+        {
+                "text": "以下哪项属于Ⅱ级（重大）质量危机？",
+                "options": [
+                        "临床使用中被认为产品内在质量问题导致出现严重人身伤害事故",
+                        "公司产品出现药品监管部门抽检内在质量不合格或产品标签、说明书违反药品监管法规，可能被药品监管部门、新闻媒体通报、公告，可能使公司信誉受到严重损害的",
+                        "产品因异物、性状改变等质量问题客户拟向新闻媒体曝光",
+                        "仅内部检验不合格"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，定义4.2：Ⅱ级（重大质量危机）：公司产品出现药品监管部门抽检内在质量不合格或产品标签、说明书违反药品监管法规，可能被药品监管部门、新闻媒体通报、公告，可能使公司信誉受到严重损害的。"
+        },
+        {
+                "text": "质量危机应急工作的组织原则是？",
+                "options": [
+                        "仅由生产管理部负责",
+                        "统一领导，分工负责。公司QA组织实施本应急预案，对应急工作进行布置、指挥和协调",
+                        "仅由QC部负责",
+                        "仅由总经理个人负责"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，程序6.1.1：统一领导，分工负责。公司QA组织实施本应急预案，对应急工作进行布置、指挥和协调。各部门协助QA处理应急工作，做好本级应急响应的具体工作。"
+        },
+        {
+                "text": "Ⅰ级质量危机发生后，信息接收人员应立即向谁报告？",
+                "options": [
+                        "仅向部门主管报告",
+                        "立即口头向质量管理负责人报告",
+                        "仅向QA专员报告",
+                        "仅向生产管理负责人报告"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，程序6.3.2.1：接到信息后，信息接收人员应立即口头向质量管理负责人报告。"
+        },
+        {
+                "text": "Ⅰ级质量危机发生后，质量管理负责人应在多长时间内向总经理报告？",
+                "options": [
+                        "立即",
+                        "2小时内",
+                        "4小时内",
+                        "24小时内"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，程序6.3.2.1：质量管理负责人获取信息后，2小时内向总经理报告。"
+        },
+        {
+                "text": "Ⅰ级质量危机发生后，应在多长时间内填报《危机事项报告表》QR1-SMP-QA-015？",
+                "options": [
+                        "2小时内",
+                        "12小时内",
+                        "24小时内",
+                        "48小时内"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-015-03，程序6.3.2.2：并在二十四小时内填报《危机事项报告表》QR1-SMP-QA-015，报送公司及集团领导。"
+        },
+        {
+                "text": "Ⅰ级质量危机响应启动后，各相关部门应在多长时间内进入应急状态？",
+                "options": [
+                        "立即",
+                        "1小时内",
+                        "2小时内",
+                        "4小时内"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-015-03，程序6.3.2.4：各相关部门在接到Ⅰ级质量危机响应启动通知2小时内进入应急状态。"
+        },
+        {
+                "text": "Ⅱ级质量危机实行什么报告制度？",
+                "options": [
+                        "每日一报",
+                        "每周一报",
+                        "每月一报",
+                        "每季度一报"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-015-03，程序6.3.3.3：Ⅱ级质量危机实行每周一报制度，每周五下午4时前将上报情况和累加情况上报QA汇总。"
+        },
+        {
+                "text": "记录管理程序适用于什么范围？",
+                "options": [
+                        "仅生产记录",
+                        "仅检验记录",
+                        "公司所有记录的管理工作",
+                        "仅质量记录"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-003-12，范围1.1：本程序规定了公司所有记录的管理工作。"
+        },
+        {
+                "text": "记录管理程序的目的是什么？",
+                "options": [
+                        "统计记录数量",
+                        "建立记录管理程序，使与生产有关的每项活动均应有记录，记录数据应完整可靠，使记录填写符合GMP的要求，以保证产品生产、质量控制和质量保证、包装所赋电子追溯码等活动可追溯",
+                        "考核员工书写能力",
+                        "降低纸张成本"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-003-12，目的2.1：建立记录管理程序，使与生产有关的每项活动均应有记录，记录数据应完整可靠，使记录填写符合GMP的要求，以保证产品生产、质量控制和质量保证、包装所赋电子追溯码等活动可追溯。"
+        },
+        {
+                "text": "根据记录管理程序，谁负责编制/修订本程序？",
+                "options": [
+                        "QC部",
+                        "生产管理部",
+                        "QA",
+                        "各车间"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-003-12，职责3.1：QA负责编制/修订本程序，记录的填写人、复核人、保管人对本程序实施负责。"
+        },
+        {
+                "text": "经审批的记录原件应存放于哪里？",
+                "options": [
+                        "使用部门",
+                        "生产管理部",
+                        "质量保证部（QA），原件专柜保管",
+                        "档案室"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-003-12，程序6.1：经审批的记录其原件均存放于质量保证部（QA），原件专柜保管。"
+        },
+        {
+                "text": "记录填写应使用什么笔？",
+                "options": [
+                        "铅笔",
+                        "红色签字笔",
+                        "黑色中性笔",
+                        "圆珠笔"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-003-12，程序6.4.1：记录用笔：用黑色中性笔记录，不得用铅笔或红色或蓝色、蓝黑色笔填写。"
+        },
+        {
+                "text": "辅助记录由谁发放？",
+                "options": [
+                        "各车间自行打印",
+                        "QA人员按需发放空白记录盖记录受控章和发放流水号",
+                        "采购部",
+                        "生产管理部"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-003-12，程序6.3.2：其他辅助记录由QA人员按需发放空白记录盖记录受控章和发放流水号，流水号为（001～999）。"
+        },
+        {
+                "text": "按月填写的记录应在多长时间内完成归档？",
+                "options": [
+                        "当月内",
+                        "次月5个工作日内",
+                        "次月10个工作日内",
+                        "次月15个工作日内"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-003-12，程序6.3.4.3：按月填写的记录：按月归档，记录完结后在次月5个工作日内完成归档。"
+        },
+        {
+                "text": "辅助记录分为哪几类？",
+                "options": [
+                        "仅2类",
+                        "按月填写的记录、连续性的记录、完结性的记录、按计划填写的记录",
+                        "仅3类",
+                        "生产记录和检验记录"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-003-12，程序6.3.4.1：辅助记录的分类：按月填写的记录、连续性的记录、完结性的记录、按计划填写的记录。"
+        },
+        {
+                "text": "连续性记录的归档要求是什么？",
+                "options": [
+                        "按年归档",
+                        "按月归档，在次月初5个工作日内完成上个月记录的归档；如填写周期不足2次/月的，按年归档，在次年初5个工作日内完成上个月记录的归档",
+                        "无需归档",
+                        "随时归档"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-003-12，程序6.3.4.3：连续性的记录：按月归档，在次月初5个工作日内完成上个月记录的归档；如填写周期不足2次/月的，按年归档，在次年初5个工作日内完成上个月记录的归档。"
+        },
+        {
+                "text": "记录制订时，如果没有特殊要求，应尽量使用什么格式？",
+                "options": [
+                        "A3格式",
+                        "A4格式",
+                        "B5格式",
+                        "自定义格式"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-003-12，程序6.1：没有特殊要求，尽量使用A4格式。"
+        },
+        {
+                "text": "状态标识管理程序适用于哪些对象？",
+                "options": [
+                        "仅成品",
+                        "仅物料",
+                        "物料、中间体、成品、厂房、仪器、设备、管道、计量标识等",
+                        "仅检验样品"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-005-12，范围1.1：本程序适用于公司所有标识的管理工作，包括物料、中间体、成品、厂房、仪器、设备、管道、计量标识等。"
+        },
+        {
+                "text": "状态标识管理程序的目的是什么？",
+                "options": [
+                        "美化生产环境",
+                        "防止产品在生产过程中有混淆、差错、污染等质量事故的发生，并保证仪器、设备的正确操作，避免安全事故的发生",
+                        "统计标识数量",
+                        "降低标识成本"
+                ],
+                "answer": "B",
+                "source": "SMP-QA-005-12，目的2.1：本程序规定了公司标识管理系统的控制要求，以防止产品在生产过程中有混淆、差错、污染等质量事故的发生，并保证仪器、设备的正确操作，避免安全事故的发生。"
+        },
+        {
+                "text": "谁负责所有标识牌的采购工作？",
+                "options": [
+                        "QA",
+                        "生产管理部",
+                        "采购部",
+                        "各车间"
+                ],
+                "answer": "C",
+                "source": "SMP-QA-005-12，职责3.2：采购部负责所有标识牌的采购工作。"
+        }
+];
+        const TOTAL = questions.length;
+        const PASS_SCORE = 73;
+
+        function renderQuestions() {
+            let html1 = '', html2 = '', html3 = '';
+            questions.forEach((q, i) => {
+                const sectionHtml = `<div class="question">
+                    <div class="question-text">${i+1}. ${q.text}</div>
+                    <div class="options">
+                        ${q.options.map((opt, j) => `<div class="option"><label><input type="radio" name="q${i}" value="${String.fromCharCode(65+j)}"> ${opt}</label></div>`).join('')}
+                    </div>
+                </div>`;
+                if (i < 10) html1 += sectionHtml;
+                else if (i < 20) html2 += sectionHtml;
+                else html3 += sectionHtml;
+            });
+            document.getElementById('section1').innerHTML = html1;
+            document.getElementById('section2').innerHTML = html2;
+            document.getElementById('section3').innerHTML = html3;
+        }
+
+        function submitQuiz() {
+            const name = document.getElementById('name').value.trim();
+            const department = document.getElementById('department').value.trim();
+            if (!name || !department) { alert('请先填写姓名和部门！'); return; }
+
+            let score = 0, correct = 0;
+            let reviews = [];
+
+            questions.forEach((q, i) => {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                const ua = sel ? sel.value : '';
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({
+                    num: i+1,
+                    text: q.text,
+                    userAnswer: ua || '未作答',
+                    correctAnswer: q.answer,
+                    isCorrect: ok,
+                    source: q.source
+                });
+            });
+
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'block';
+            const pass = score >= PASS_SCORE;
+            document.getElementById('scoreStatus').innerHTML = pass ? '✅ 恭喜通过！' : '❌ 未通过';
+            document.getElementById('scoreStatus').className = pass ? 'score-pass' : 'score-fail';
+            document.getElementById('scoreNumber').textContent = score + ' 分';
+            document.getElementById('scoreDetail').textContent = `${name}（${department}）| 答对 ${correct}/${TOTAL} 题`;
+
+            let reviewHtml = '<h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>';
+            reviews.forEach(r => {
+                reviewHtml += `<div class="review-item ${r.isCorrect ? 'review-correct' : 'review-wrong'}">
+                    <div class="review-header">
+                        <span class="review-qnum">第 ${r.num} 题</span>
+                        <span class="review-icon">${r.isCorrect ? '✅' : '❌'}</span>
+                    </div>
+                    <div style="margin-bottom:8px;">${r.text}</div>
+                    ${!r.isCorrect ? `<div class="review-your">你的答案：${r.userAnswer}</div>` : ''}
+                    <div class="review-answer">正确答案：${r.correctAnswer}</div>
+                    <div class="source-text">📖 源文件原文：${r.source}</div>
+                </div>`;
+            });
+            document.getElementById('reviewSection').innerHTML = reviewHtml;
+        }
+
+        function restartQuiz() {
+            document.getElementById('quizPage').style.display = 'block';
+            document.getElementById('resultPage').style.display = 'none';
+            document.getElementById('quizForm').reset();
+        }
+
+        renderQuestions();
+    </script>
+</body>
+</html>
