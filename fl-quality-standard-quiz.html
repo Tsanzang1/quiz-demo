@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2%氟苯尼考预混剂质量标准培训考试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#f5f5f5;color:#333;line-height:1.6}
+.container{max-width:800px;margin:0 auto;padding:20px}
+.header{background:linear-gradient(135deg,#051C2C,#006BA6);color:#fff;padding:30px 20px;text-align:center;border-radius:12px 12px 0 0;margin-bottom:0}
+.header h1{font-size:22px;margin-bottom:8px}
+.header p{font-size:14px;opacity:0.9}
+.info-bar{background:#fff;padding:15px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-around;flex-wrap:wrap}
+.info-item{text-align:center;padding:5px 15px}
+.info-item .label{font-size:12px;color:#999}
+.info-item .value{font-size:18px;font-weight:bold;color:#051C2C}
+.section{background:#fff;margin:0;padding:20px;border-bottom:1px solid #eee}
+.section-title{font-size:18px;font-weight:bold;color:#051C2C;margin-bottom:15px;padding-bottom:10px;border-bottom:2px solid #051C2C}
+.question{margin-bottom:20px;padding:15px;background:#fafafa;border-radius:8px;border-left:3px solid #051C2C}
+.question .q-text{font-size:15px;font-weight:500;margin-bottom:12px}
+.question .q-num{color:#051C2C;font-weight:bold;margin-right:5px}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{display:flex;align-items:center;padding:10px 12px;background:#fff;border:1px solid #ddd;border-radius:6px;cursor:pointer;transition:all 0.2s}
+.option:hover{border-color:#006BA6;background:#f0f8ff}
+.option input{margin-right:10px}
+.option.selected{border-color:#006BA6;background:#e3f2fd}
+.option.correct{border-color:#4caf50;background:#e8f5e9}
+.option.wrong{border-color:#f44336;background:#ffebee}
+.judge-options{display:flex;gap:15px}
+.judge-btn{flex:1;padding:12px;text-align:center;border:2px solid #ddd;border-radius:8px;cursor:pointer;font-size:15px;transition:all 0.2s}
+.judge-btn:hover{border-color:#006BA6}
+.judge-btn.selected{border-color:#006BA6;background:#e3f2fd;color:#051C2C;font-weight:bold}
+.judge-btn.correct{border-color:#4caf50;background:#e8f5e9;color:#2e7d32}
+.judge-btn.wrong{border-color:#f44336;background:#ffebee;color:#c62828}
+.fill-input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:15px;transition:border-color 0.2s}
+.fill-input:focus{outline:none;border-color:#006BA6}
+.fill-input.correct{border-color:#4caf50;background:#e8f5e9}
+.fill-input.wrong{border-color:#f44336;background:#ffebee}
+.explanation{margin-top:10px;padding:10px 12px;background:#fff3e0;border-radius:6px;font-size:13px;color:#e65100;display:none}
+.explanation.show{display:block}
+.submit-area{background:#fff;padding:20px;text-align:center}
+.submit-btn{background:linear-gradient(135deg,#051C2C,#006BA6);color:#fff;border:none;padding:15px 60px;font-size:18px;border-radius:8px;cursor:pointer;font-weight:bold;transition:all 0.3s}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(5,28,44,0.3)}
+.submit-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}
+.result{display:none;text-align:center;padding:30px;background:#fff;border-radius:12px;margin:20px 0;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.result.show{display:block}
+.result .score{font-size:64px;font-weight:bold;color:#051C2C}
+.result .score.pass{color:#4caf50}
+.result .score.fail{color:#f44336}
+.result .msg{font-size:18px;margin-top:10px}
+.result .detail{font-size:14px;color:#666;margin-top:15px}
+.progress{position:sticky;top:0;background:#fff;padding:10px 20px;border-bottom:1px solid #eee;z-index:100;display:flex;align-items:center;gap:10px}
+.progress-bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#051C2C,#006BA6);border-radius:3px;transition:width 0.3s}
+.progress-text{font-size:13px;color:#666;white-space:nowrap}
+.name-form{background:#fff;padding:20px;margin-bottom:15px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.name-form .form-row{display:flex;gap:15px;margin-bottom:10px;flex-wrap:wrap}
+.name-form input{flex:1;min-width:150px;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:15px}
+.name-form input:focus{outline:none;border-color:#006BA6}
+.timer{font-size:14px;color:#666;font-weight:500}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>2%氟苯尼考预混剂质量标准培训考试</h1>
+<p>满分100分 ｜ 及格线80分 ｜ 考试时间不限</p>
+</div>
+<div class="container">
+<div class="info-bar">
+<div class="info-item"><div class="label">选择题</div><div class="value">10题×4分</div></div>
+<div class="info-item"><div class="label">判断题</div><div class="value">10题×4分</div></div>
+<div class="info-item"><div class="label">填空题</div><div class="value">5题×4分</div></div>
+<div class="info-item"><div class="label">总分</div><div class="value">100分</div></div>
+</div>
+
+<div class="name-form">
+<div class="form-row">
+<input type="text" id="userName" placeholder="请输入您的姓名" required>
+<input type="text" id="userDept" placeholder="请输入您的部门" required>
+</div>
+</div>
+
+<div id="quiz"></div>
+
+<div class="submit-area">
+<button class="submit-btn" id="submitBtn" onclick="submitQuiz()">提交答卷</button>
+</div>
+
+<div class="result" id="result">
+<div class="score" id="scoreDisplay"></div>
+<div class="msg" id="scoreMsg"></div>
+<div class="detail" id="scoreDetail"></div>
+</div>
+</div>
+
+<script>
+const quizData = {"title": "2%氟苯尼考预混剂质量标准培训考试", "passing_score": 80, "questions": {"choice": [{"q": "2%氟苯尼考预混剂的质量标准依据是以下哪一部标准？", "options": ["中华人民共和国药典2020版", "中华人民共和国兽药典2015版一部", "美国药典USP43", "欧洲药典EP10"], "answer": 1, "explanation": "质量标准依据为中华人民共和国兽药典2015版一部（STP-QS-FL-101-01 第2.1条）。"}, {"q": "2%氟苯尼考预混剂属于哪一类抗生素？", "options": ["大环内酯类", "β-内酰胺类", "酰胺醇类", "氨基糖苷类"], "answer": 2, "explanation": "氟苯尼考属于酰胺醇类抗生素（STP-QS-FL-101-01 第3.3.1条）。"}, {"q": "2%氟苯尼考预混剂的规格是？", "options": ["1%", "2%", "5%", "10%"], "answer": 1, "explanation": "规格为2%（STP-QS-FL-101-01 第3.8.1条）。"}, {"q": "2%氟苯尼考预混剂混饲给药时，每1000kg饲料猪的用量为？", "options": ["500~1000g", "1000~2000g", "2000~3000g", "3000~4000g"], "answer": 1, "explanation": "混饲：每1000kg饲料，猪1000~2000g，连用7日（STP-QS-FL-101-01 第3.4.1条）。"}, {"q": "2%氟苯尼考预混剂混饲给药的疗程为？", "options": ["3日", "5日", "7日", "14日"], "answer": 2, "explanation": "连用7日（STP-QS-FL-101-01 第3.4.1条）。"}, {"q": "2%氟苯尼考预混剂用于猪的休药期为？", "options": ["7日", "14日", "21日", "28日"], "answer": 1, "explanation": "猪休药期为14日（STP-QS-FL-101-01 第3.7.1条）。"}, {"q": "2%氟苯尼考预混剂的包装规格为？", "options": ["5kg/袋", "10kg/袋", "20kg/袋", "25kg/袋"], "answer": 1, "explanation": "10kg/袋，内包装为单层聚乙烯袋，外包装为双层牛皮纸（STP-QS-FL-101-01 第7.1条）。"}, {"q": "2%氟苯尼考预混剂的有效期为？", "options": ["1年", "1.5年", "2年", "3年"], "answer": 2, "explanation": "有效期为2年（STP-QS-FL-101-01 第6.1条）。"}, {"q": "粒度检查中，二号标准筛相当于多少目？", "options": ["10目", "24目", "40目", "60目"], "answer": 1, "explanation": "二号标准筛为24目（SOP-QC(FL)-101-04 第6.2.4.1条）。"}, {"q": "含量测定中，本品含氟苯尼考应为标示量的多少？", "options": ["90.0%~110.0%", "94.0%~108.5%", "95.0%~105.0%", "98.0%~102.0%"], "answer": 1, "explanation": "本品含氟苯尼考应为标示量的94.0%~108.5%（SOP-QC(FL)-101-04 第6.2.5.10条）。"}], "judge": [{"q": "2%氟苯尼考预混剂的标准操作规程文件编码为STP-QS-FL-101-01。", "answer": true, "explanation": "正确。质量标准文件编码为STP-QS-FL-101-01。"}, {"q": "2%氟苯尼考预混剂可用于疫苗接种期的动物。", "answer": false, "explanation": "错误。疫苗接种期或免疫功能严重缺损的动物禁用（STP-QS-FL-101-01 第3.6.1条）。"}, {"q": "干燥失重的合格标准为≤8.0%。", "answer": true, "explanation": "正确。干燥失重标准为≤8.0%（SOP-QC(FL)-101-04 第6.2.4.2条）。"}, {"q": "粒度检查中，样品称取量为5.0g±0.1g。", "answer": false, "explanation": "错误。粒度检查称取样品10.0g±0.1g（SOP-QC(FL)-101-04 第6.2.4.1条）。"}, {"q": "2%氟苯尼考预混剂的贮藏条件为密闭，在干燥处保存。", "answer": true, "explanation": "正确。贮藏条件为密闭，在干燥处保存（STP-QS-FL-101-01 第5.1条）。"}, {"q": "鉴别试验中，供试品主峰保留时间与对照品主峰保留时间的比值应在0.98~1.02之间。", "answer": true, "explanation": "正确。0.98＜供试品主峰RT/对照品主峰RT＜1.02（SOP-QC(FL)-101-04 第6.2.3.2条）。"}, {"q": "单个袋子装量不少于标示装量的95%。", "answer": false, "explanation": "错误。单个袋子装量不少于标示装量的99%（9.9kg/袋）（SOP-QC(FL)-101-04 第6.2.4.3条）。"}, {"q": "含量测定使用的检测波长为224nm。", "answer": true, "explanation": "正确。检测波长为224nm（SOP-QC(FL)-101-04 第6.2.5.4条）。"}, {"q": "霉菌检查取2.0g±0.05g样品进行目视检查。", "answer": true, "explanation": "正确。取2.0g±0.05g样品，目视无可见霉菌生长（SOP-QC(FL)-101-04 第6.2.2条）。"}, {"q": "肾功能不全患畜使用氟苯尼考时无需调整剂量。", "answer": false, "explanation": "错误。肾功能不全患畜需适当减量或延长给药间隔时间（STP-QS-FL-101-01 第3.6.2条）。"}], "fill": [{"q": "2%氟苯尼考预混剂用于___杆菌和大肠杆菌感染。", "answer": "巴氏", "explanation": "用于巴氏杆菌和大肠杆菌感染（STP-QS-FL-101-01 第3.3.1条）。"}, {"q": "干燥失重检查中，干燥温度为___℃。", "answer": "105", "explanation": "在105℃电热恒温干燥箱中干燥（SOP-QC(FL)-101-04 第6.2.4.2条）。"}, {"q": "含量测定中，流动相为乙腈:水:冰醋酸=___:1979:21。", "answer": "1000", "explanation": "流动相：按乙腈:水:冰醋酸=1000:1979:21的体积比混合（SOP-QC(FL)-101-04 第6.2.5.4条）。"}, {"q": "粒度检查的标准为___%通过二号筛。", "answer": "100", "explanation": "100%通过二号筛（SOP-QC(FL)-101-04 第6.2.4.1条）。"}, {"q": "含量测定中，色谱柱柱温为___℃。", "answer": "30", "explanation": "柱温：30℃（SOP-QC(FL)-101-04 第6.2.5.4条）。"}]}};
+let userAnswers = {choice:[],judge:[],fill:[]};
+let submitted = false;
+
+function renderQuiz(){
+    let html = '';
+    // Choice
+    html += '<div class="section"><div class="section-title">一、选择题（每题4分，共40分）</div>';
+    quizData.questions.choice.forEach((q,i)=>{
+        html += '<div class="question" id="choice-'+i+'">';
+        html += '<div class="q-text"><span class="q-num">('+ (i+1) +')</span>'+q.q+'</div>';
+        html += '<div class="options">';
+        q.options.forEach((opt,j)=>{
+            html += '<label class="option" id="choice-'+i+'-'+j+'" onclick="selectChoice('+i+','+j+')">';
+            html += '<input type="radio" name="choice-'+i+'" value="'+j+'">';
+            html += '<span>'+String.fromCharCode(65+j)+'. '+opt+'</span>';
+        html += '</label>';
+        });
+        html += '</div>';
+        html += '<div class="explanation" id="exp-choice-'+i+'">📖 '+q.explanation+'</div>';
+        html += '</div>';
+    });
+    html += '</div>';
+    // Judge
+    html += '<div class="section"><div class="section-title">二、判断题（每题4分，共40分）</div>';
+    quizData.questions.judge.forEach((q,i)=>{
+        html += '<div class="question" id="judge-'+i+'">';
+        html += '<div class="q-text"><span class="q-num">('+ (i+1) +')</span>'+q.q+'</div>';
+        html += '<div class="judge-options">';
+        html += '<div class="judge-btn" id="judge-'+i+'-true" onclick="selectJudge('+i+',true)">✓ 正确</div>';
+        html += '<div class="judge-btn" id="judge-'+i+'-false" onclick="selectJudge('+i+',false)">✗ 错误</div>';
+        html += '</div>';
+        html += '<div class="explanation" id="exp-judge-'+i+'">📖 '+q.explanation+'</div>';
+        html += '</div>';
+    });
+    html += '</div>';
+    // Fill
+    html += '<div class="section"><div class="section-title">三、填空题（每题4分，共20分）</div>';
+    quizData.questions.fill.forEach((q,i)=>{
+        html += '<div class="question" id="fill-'+i+'">';
+        html += '<div class="q-text"><span class="q-num">('+ (i+1) +')</span>'+q.q+'</div>';
+        html += '<input type="text" class="fill-input" id="fill-'+i+'-input" placeholder="请输入答案" oninput="updateProgress()">';
+        html += '<div class="explanation" id="exp-fill-'+i+'">📖 '+q.explanation+'</div>';
+        html += '</div>';
+    });
+    html += '</div>';
+    document.getElementById('quiz').innerHTML = html;
+}
+
+function selectChoice(qi,oi){
+    if(submitted) return;
+    userAnswers.choice[qi] = oi;
+    // Update visual
+    for(let j=0;j<4;j++){
+        const el = document.getElementById('choice-'+qi+'-'+j);
+        el.classList.remove('selected');
+    }
+    document.getElementById('choice-'+qi+'-'+oi).classList.add('selected');
+    updateProgress();
+}
+
+function selectJudge(qi,val){
+    if(submitted) return;
+    userAnswers.judge[qi] = val;
+    document.getElementById('judge-'+qi+'-true').classList.remove('selected');
+    document.getElementById('judge-'+qi+'-false').classList.remove('selected');
+    document.getElementById('judge-'+qi+'-'+(val?'true':'false')).classList.add('selected');
+    updateProgress();
+}
+
+function updateProgress(){
+    const total = quizData.questions.choice.length + quizData.questions.judge.length + quizData.questions.fill.length;
+    let answered = userAnswers.choice.filter(a=>a!==undefined).length +
+                   userAnswers.judge.filter(a=>a!==undefined).length;
+    // Count filled inputs
+    quizData.questions.fill.forEach((q,i)=>{
+        const inp = document.getElementById('fill-'+i+'-input');
+        if(inp && inp.value.trim()) answered++;
+    });
+    const pct = Math.round(answered/total*100);
+    // Could add progress bar if needed
+}
+
+function submitQuiz(){
+    if(submitted) return;
+    const name = document.getElementById('userName').value.trim();
+    const dept = document.getElementById('userDept').value.trim();
+    if(!name){alert('请输入您的姓名');return;}
+    if(!dept){alert('请输入您的部门');return;}
+    
+    if(!confirm('确定提交答卷？提交后将显示成绩和解析。')) return;
+    submitted = true;
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = '已提交';
+    
+    let score = 0;
+    let choiceCorrect = 0, judgeCorrect = 0, fillCorrect = 0;
+    
+    // Grade choice
+    quizData.questions.choice.forEach((q,i)=>{
+        const userAns = userAnswers.choice[i];
+        const correct = q.answer;
+        const isCorrect = userAns === correct;
+        if(isCorrect){score+=4;choiceCorrect++;}
+        // Show result
+        for(let j=0;j<4;j++){
+            const el = document.getElementById('choice-'+i+'-'+j);
+            el.style.cursor = 'default';
+            if(j===correct) el.classList.add('correct');
+            else if(j===userAns && !isCorrect) el.classList.add('wrong');
+        }
+        document.getElementById('exp-choice-'+i).classList.add('show');
+    });
+    
+    // Grade judge
+    quizData.questions.judge.forEach((q,i)=>{
+        const userAns = userAnswers.judge[i];
+        const correct = q.answer;
+        const isCorrect = userAns === correct;
+        if(isCorrect){score+=4;judgeCorrect++;}
+        const trueEl = document.getElementById('judge-'+i+'-true');
+        const falseEl = document.getElementById('judge-'+i+'-false');
+        trueEl.style.cursor = 'default';
+        falseEl.style.cursor = 'default';
+        if(correct===true) trueEl.classList.add('correct');
+        else falseEl.classList.add('correct');
+        if(userAns!==correct && userAns!==undefined){
+            if(userAns===true) trueEl.classList.add('wrong');
+            else falseEl.classList.add('wrong');
+        }
+        document.getElementById('exp-judge-'+i).classList.add('show');
+    });
+    
+    // Grade fill
+    quizData.questions.fill.forEach((q,i)=>{
+        const inp = document.getElementById('fill-'+i+'-input');
+        const userAns = inp.value.trim();
+        const isCorrect = userAns === q.answer;
+        if(isCorrect){score+=4;fillCorrect++;}
+        inp.classList.add(isCorrect?'correct':'wrong');
+        inp.readOnly = true;
+        document.getElementById('exp-fill-'+i).classList.add('show');
+    });
+    
+    // Show result
+    const result = document.getElementById('result');
+    result.classList.add('show');
+    const scoreEl = document.getElementById('scoreDisplay');
+    scoreEl.textContent = score + '分';
+    scoreEl.className = 'score ' + (score>=80?'pass':'fail');
+    document.getElementById('scoreMsg').textContent = score>=80?'🎉 恭喜通过考试！':'⚠️ 未达到及格线，请重新学习后补考';
+    document.getElementById('scoreDetail').innerHTML = 
+        '选择题：'+choiceCorrect+'/10  |  判断题：'+judgeCorrect+'/10  |  填空题：'+fillCorrect+'/5<br>'+
+        '姓名：'+name+'  |  部门：'+dept;
+    
+    // Scroll to result
+    result.scrollIntoView({behavior:'smooth'});
+    
+    // Send data to server (for auto-grading service)
+    const submitData = {
+        name: name,
+        dept: dept,
+        training: '2%氟苯尼考预混剂质量标准',
+        score: score,
+        choice_correct: choiceCorrect,
+        judge_correct: judgeCorrect,
+        fill_correct: fillCorrect,
+        total: 25,
+        correct: choiceCorrect+judgeCorrect+fillCorrect,
+        pass: score >= 80,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Store in localStorage for the auto-grading service to pick up
+    const submissions = JSON.parse(localStorage.getItem('quiz_submissions')||'[]');
+    submissions.push(submitData);
+    localStorage.setItem('quiz_submissions', JSON.stringify(submissions));
+}
+
+// Render on load
+renderQuiz();
+</script>
+</body>
+</html>
