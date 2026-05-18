@@ -42,6 +42,34 @@
         .review-your { color: #C62828; font-size: 14px; margin-top: 3px; }
         .source-text { background: #fff; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 13px; color: #666; border: 1px dashed #ccc; }
         .btn-restart { display: block; width: 100%; padding: 15px; background: #007A53; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        .report-card { border: 2px solid #051C2C; border-radius: 12px; padding: 25px; margin-bottom: 20px; background: #fff; }
+        .report-header { text-align: center; border-bottom: 2px solid #051C2C; padding-bottom: 15px; margin-bottom: 15px; }
+        .report-header h2 { color: #051C2C; font-size: 20px; margin-bottom: 5px; }
+        .report-header p { color: #666; font-size: 13px; }
+        .report-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .report-info-item { padding: 8px 12px; background: #f8f9fa; border-radius: 4px; }
+        .report-info-item .label { font-size: 12px; color: #999; }
+        .report-info-item .value { font-size: 15px; color: #333; font-weight: bold; }
+        .report-score-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px; }
+        .report-score-big { font-size: 48px; font-weight: bold; color: #051C2C; }
+        .report-pass-badge { padding: 8px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; }
+        .report-pass-badge.pass { background: #e8f5e9; color: #007A53; }
+        .report-pass-badge.fail { background: #ffebee; color: #C62828; }
+        .report-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .report-table th { background: #051C2C; color: white; padding: 8px; font-size: 13px; text-align: left; }
+        .report-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .report-table tr:nth-child(even) { background: #fafafa; }
+        .report-footer { text-align: center; color: #999; font-size: 12px; border-top: 1px dashed #ddd; padding-top: 10px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-group button { flex: 1; }
+        .btn-report { display: block; width: 100%; padding: 15px; background: #006BA6; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .btn-report:hover { background: #005082; }
+        .hidden { display: none; }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .btn-group, .btn-report, .btn-restart, .review-section { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -76,12 +104,58 @@
 
         <div id="resultPage" class="result">
             <h1>📊 考试成绩</h1>
-            <div class="score-card">
-                <div class="score-status" id="scoreStatus"></div>
-                <div class="score-number" id="scoreNumber"></div>
-                <div id="scoreDetail"></div>
+
+            <!-- 成绩单卡片（可截图） -->
+            <div id="reportCard" class="report-card">
+                <div class="report-header">
+                    <h2>📋 培训考试成绩报告</h2>
+                    <p>QA三项管理程序 | 总分 92 分 | 及格线 73 分</p>
+                </div>
+                <div class="report-info">
+                    <div class="report-info-item">
+                        <div class="label">姓名</div>
+                        <div class="value" id="rptName">-</div>
+                    </div>
+                    <div class="report-info-item">
+                        <div class="label">部门</div>
+                        <div class="value" id="rptDept">-</div>
+                    </div>
+                    <div class="report-info-item">
+                        <div class="label">考试时间</div>
+                        <div class="value" id="rptTime">-</div>
+                    </div>
+                    <div class="report-info-item">
+                        <div class="label">题目数量</div>
+                        <div class="value">23 题 × 4分</div>
+                    </div>
+                </div>
+                <div class="report-score-row">
+                    <div>
+                        <div style="font-size:13px;color:#666;margin-bottom:5px;">考试成绩</div>
+                        <div class="report-score-big" id="rptScore">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size:13px;color:#666;margin-bottom:5px;">考试结果</div>
+                        <div class="report-pass-badge" id="rptBadge">-</div>
+                    </div>
+                </div>
+                <table class="report-table">
+                    <thead>
+                        <tr><th>题号</th><th>答案</th><th>正确</th><th>得分</th></tr>
+                    </thead>
+                    <tbody id="rptTable"></tbody>
+                </table>
+                <div class="report-footer">
+                    <p>本成绩单由系统自动生成，请截图保存</p>
+                </div>
             </div>
-            <div class="review-section" id="reviewSection"></div>
+
+            <div class="btn-group">
+                <button class="btn-report" onclick="window.print()">🖨️ 打印成绩单</button>
+                <button class="btn-report" style="background:#007A53;" onclick="toggleReview()">📝 查看逐题解析</button>
+            </div>
+
+            <div class="review-section hidden" id="reviewSection"></div>
             <button class="btn-restart" onclick="restartQuiz()">重新答题</button>
         </div>
     </div>
@@ -389,11 +463,46 @@
             document.getElementById('quizPage').style.display = 'none';
             document.getElementById('resultPage').style.display = 'block';
             const pass = score >= PASS_SCORE;
-            document.getElementById('scoreStatus').innerHTML = pass ? '✅ 恭喜通过！' : '❌ 未通过';
-            document.getElementById('scoreStatus').className = pass ? 'score-pass' : 'score-fail';
-            document.getElementById('scoreNumber').textContent = score + ' 分';
-            document.getElementById('scoreDetail').textContent = `${name}（${department}）| 答对 ${correct}/${TOTAL} 题`;
 
+            // 填充成绩单
+            const now = new Date();
+            const timeStr = now.getFullYear() + '-' +
+                String(now.getMonth()+1).padStart(2,'0') + '-' +
+                String(now.getDate()).padStart(2,'0') + ' ' +
+                String(now.getHours()).padStart(2,'0') + ':' +
+                String(now.getMinutes()).padStart(2,'0');
+
+            document.getElementById('rptName').textContent = name;
+            document.getElementById('rptDept').textContent = department;
+            document.getElementById('rptTime').textContent = timeStr;
+            document.getElementById('rptScore').textContent = score + ' 分';
+
+            const badge = document.getElementById('rptBadge');
+            if (pass) {
+                badge.textContent = '✅ 通过';
+                badge.className = 'report-pass-badge pass';
+            } else {
+                badge.textContent = '❌ 未通过';
+                badge.className = 'report-pass-badge fail';
+            }
+
+            // 填充逐题表格
+            let tableHtml = '';
+            reviews.forEach(r => {
+                tableHtml += `<tr>
+                    <td>第${r.num}题</td>
+                    <td>${r.userAnswer}</td>
+                    <td>${r.isCorrect ? '✅' : '❌'}</td>
+                    <td>${r.isCorrect ? '4' : '0'}</td>
+                </tr>`;
+            });
+            tableHtml += `<tr style="font-weight:bold;background:#f0f0f0;">
+                <td colspan="3">合计</td>
+                <td>${score} 分</td>
+            </tr>`;
+            document.getElementById('rptTable').innerHTML = tableHtml;
+
+            // 逐题解析
             let reviewHtml = '<h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>';
             reviews.forEach(r => {
                 reviewHtml += `<div class="review-item ${r.isCorrect ? 'review-correct' : 'review-wrong'}">
@@ -408,6 +517,11 @@
                 </div>`;
             });
             document.getElementById('reviewSection').innerHTML = reviewHtml;
+        }
+
+        function toggleReview() {
+            const el = document.getElementById('reviewSection');
+            el.classList.toggle('hidden');
         }
 
         function restartQuiz() {
