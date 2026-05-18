@@ -356,8 +356,9 @@
     function showAdmin(tab) {
         ['adminQ','adminS','adminR'].forEach(x => document.getElementById(x).style.display = 'none');
         ['navQ','navS','navR'].forEach(x => document.getElementById(x).classList.remove('active'));
-        document.getElementById('admin' + tab.charAt(0).toUpperCase() + tab.slice(1,2)).style.display = 'block';
-        document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1,2)).classList.add('active');
+        const key = tab === 'questions' ? 'Q' : tab === 'scores' ? 'S' : 'R';
+        document.getElementById('admin' + key).style.display = 'block';
+        document.getElementById('nav' + key).classList.add('active');
         if (tab === 'questions') renderQTable();
         if (tab === 'scores') renderSTable();
         if (tab === 'ranking') renderRanking();
