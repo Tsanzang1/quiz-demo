@@ -130,6 +130,7 @@
                 <span id="homeUserInfo"></span>
                 <span onclick="showPage('historyPage'); renderHistory();">📊 历史</span>
                 <span onclick="showPage('adminPage'); showAdmin('questions');">🔧 管理</span>
+                <span onclick="DB.set('adminLoggedIn', false); alert('已退出管理后台');">退出管理</span>
             </div>
         </div>
         <div class="container">
@@ -354,14 +355,29 @@
     }
 
     function showAdmin(tab) {
+        // 检查管理员密码
+        if (!DB.get('adminLoggedIn')) {
+            const pw = prompt('请输入管理密码：');
+            if (pw !== 'admin123') {
+                if (pw !== null) alert('密码错误！');
+                return;
+            }
+            DB.set('adminLoggedIn', true);
+        }
+        
         ['adminQ','adminS','adminR'].forEach(x => document.getElementById(x).style.display = 'none');
         ['navQ','navS','navR'].forEach(x => document.getElementById(x).classList.remove('active'));
-        const key = tab === 'questions' ? 'Q' : tab === 'scores' ? 'S' : 'R';
+        
+        let key = 'Q';
+        if (tab === 'scores') key = 'S';
+        else if (tab === 'ranking') key = 'R';
+        
         document.getElementById('admin' + key).style.display = 'block';
         document.getElementById('nav' + key).classList.add('active');
+        
         if (tab === 'questions') renderQTable();
-        if (tab === 'scores') renderSTable();
-        if (tab === 'ranking') renderRanking();
+        else if (tab === 'scores') renderSTable();
+        else if (tab === 'ranking') renderRanking();
     }
 
     function showModal(id) { document.getElementById(id).style.display = 'block'; }
