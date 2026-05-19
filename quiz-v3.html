@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA管理程序培训考试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .entry-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #051C2C, #006BA6); }
+        .entry-box { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .entry-box h1 { text-align: center; color: #051C2C; font-size: 24px; margin-bottom: 5px; }
+        .entry-box .sub { text-align: center; color: #999; margin-bottom: 25px; font-size: 14px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #333; font-weight: bold; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+        .form-group input:focus { outline: none; border-color: #006BA6; }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: #051C2C; color: white; }
+        .btn-primary:hover { background: #006BA6; }
+        .btn-success { background: #007A53; color: white; }
+        .btn-danger { background: #C62828; color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; width: auto; display: inline-block; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .error { background: #ffebee; color: #C62828; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+        .loading { text-align: center; padding: 30px; color: #999; }
+        
+        .topbar { background: #051C2C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 18px; }
+        .topbar .right { font-size: 14px; }
+        .topbar .right span { margin-left: 15px; cursor: pointer; opacity: 0.8; }
+        .topbar .right span:hover { opacity: 1; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #051C2C; margin-bottom: 15px; font-size: 18px; }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #666; }
+        .info-value { color: #333; font-weight: bold; }
+        .status-done { color: #007A53; }
+        .status-pending { color: #D46A00; }
+        
+        .question { background: white; border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .q-num { color: #006BA6; font-weight: bold; margin-bottom: 10px; }
+        .q-text { color: #333; font-size: 16px; line-height: 1.6; margin-bottom: 15px; }
+        .options { padding-left: 10px; }
+        .option { margin-bottom: 10px; }
+        .option label { cursor: pointer; padding: 10px 15px; border-radius: 8px; display: block; transition: background 0.2s; border: 1px solid #eee; }
+        .option label:hover { background: #e8f4fc; }
+        .option input { margin-right: 10px; }
+        
+        .score-card { background: linear-gradient(135deg, #051C2C, #006BA6); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 20px; }
+        .score-big { font-size: 64px; font-weight: bold; margin: 15px 0; }
+        .pass { color: #69F0AE; }
+        .fail { color: #FF5252; }
+        .review { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .review-correct { border-left: 4px solid #007A53; }
+        .review-wrong { border-left: 4px solid #C62828; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .review-q { font-weight: bold; color: #333; }
+        .review-text { color: #333; margin-bottom: 8px; }
+        .review-your { color: #C62828; font-size: 14px; }
+        .review-correct-ans { color: #007A53; font-size: 14px; }
+        .review-explain { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 13px; color: #666; }
+        
+        .admin-nav { background: white; display: flex; border-bottom: 2px solid #eee; overflow-x: auto; }
+        .admin-nav a { padding: 12px 18px; text-decoration: none; color: #666; font-size: 14px; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; }
+        .admin-nav a.active { color: #006BA6; border-bottom-color: #006BA6; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 13px; color: #666; border-bottom: 2px solid #eee; }
+        td { padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        tr:hover { background: #fafafa; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .badge-success { background: #e8f5e9; color: #007A53; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; }
+        .modal { background: white; max-width: 600px; margin: 40px auto; padding: 25px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
+        .modal h2 { margin-bottom: 20px; color: #051C2C; }
+        .modal .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stat-card { text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .stat-num { font-size: 28px; font-weight: bold; color: #051C2C; }
+        .stat-label { font-size: 13px; color: #666; margin-top: 5px; }
+        
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 入口页 -->
+    <div class="page active" id="entryPage">
+        <div class="entry-page">
+            <div class="entry-box">
+                <h1>📋 培训考试</h1>
+                <p class="sub">QA管理程序 | 20题×1分 | 及格线16分</p>
+                <div class="error" id="entryError"></div>
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" id="enterName" placeholder="请输入姓名" required>
+                    </div>
+                    <div class="form-group">
+                        <label>部门</label>
+                        <input type="text" id="enterDept" placeholder="请输入部门" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">开始答题</button>
+                </form>
+                <p style="text-align:center;margin-top:15px;font-size:13px;color:#999;">
+                    每天可答题一次 · 随机抽20题 · 提交后查看成绩
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页 -->
+    <div class="page" id="homePage">
+        <div class="topbar">
+            <h1>📋 培训考试</h1>
+            <div class="right">
+                <span id="homeUserInfo"></span>
+                <span onclick="showPage('historyPage'); renderHistory();">📊 历史</span>
+                <span onclick="showPage('adminPage'); showAdmin('questions');">🔧 管理</span>
+                <span onclick="localStorage.removeItem('qsys_admin'); alert('已退出管理后台');">退出管理</span>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <h2>📝 今日答题</h2>
+                <div class="info-row">
+                    <span class="info-label">今日状态</span>
+                    <span class="info-value" id="todayStatus">加载中...</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">题目数量</span>
+                    <span class="info-value">20 题（每题 1 分）</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">题库总量</span>
+                    <span class="info-value" id="totalQCount">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">及格线</span>
+                    <span class="info-value">16 分（80%）</span>
+                </div>
+                <div id="homeActions" style="margin-top:15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div class="page" id="quizPage">
+        <div class="topbar">
+            <h1>📝 答题中（共20题）</h1>
+            <div class="right"><span onclick="showPage('homePage')">返回首页</span></div>
+        </div>
+        <div class="container">
+            <form id="quizForm"></form>
+            <button class="btn btn-primary" onclick="submitQuiz()" style="margin-top:15px;">提交答卷</button>
+        </div>
+    </div>
+
+    <!-- 成绩页 -->
+    <div class="page" id="resultPage">
+        <div class="container">
+            <div class="score-card">
+                <div style="font-size:18px;">📊 考试成绩</div>
+                <div class="score-big" id="resScore">-</div>
+                <div id="resDetail" style="font-size:16px;opacity:0.9;"></div>
+            </div>
+            <h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>
+            <div id="resReview"></div>
+            <button class="btn btn-success" onclick="showPage('homePage')" style="margin-top:15px;">返回首页</button>
+        </div>
+    </div>
+
+    <!-- 历史成绩 -->
+    <div class="page" id="historyPage">
+        <div class="topbar">
+            <h1>📊 历史成绩</h1>
+            <div class="right"><span onclick="showPage('homePage')">返回首页</span></div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <table>
+                    <thead><tr><th>日期</th><th>时间</th><th>得分</th><th>正确率</th></tr></thead>
+                    <tbody id="histTable"></tbody>
+                </table>
+                <p id="histEmpty" style="color:#999;text-align:center;padding:20px;display:none;">暂无成绩记录</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理后台 -->
+    <div class="page" id="adminPage">
+        <div class="topbar">
+            <h1>🔧 管理后台</h1>
+            <div class="right"><span onclick="showPage('homePage')">返回首页</span></div>
+        </div>
+        <div class="admin-nav">
+            <a onclick="showAdmin('questions')" id="navQ">📚 题库管理</a>
+            <a onclick="showAdmin('scores')" id="navS">📊 成绩记录</a>
+            <a onclick="showAdmin('ranking')" id="navR">🏆 按月排行</a>
+        </div>
+        <div class="container">
+            <div id="adminQ">
+                <div class="card">
+                    <h2>📚 题库管理</h2>
+                    <div class="filter-bar">
+                        <select id="qCatFilter" onchange="renderQTable()"><option value="">全部分类</option></select>
+                    </div>
+                    <table>
+                        <thead><tr><th>ID</th><th>分类</th><th>题目</th><th>答案</th></tr></thead>
+                        <tbody id="qTable"></tbody>
+                    </table>
+                    <p id="qEmpty" style="color:#999;text-align:center;padding:20px;display:none;">题库为空</p>
+                </div>
+            </div>
+            <div id="adminS" style="display:none;">
+                <div class="card">
+                    <h2>📊 成绩记录</h2>
+                    <div class="filter-bar">
+                        <input type="text" placeholder="搜索姓名" id="sNameFilter" oninput="renderSTable()">
+                        <input type="month" id="sMonthFilter" onchange="renderSTable()">
+                    </div>
+                    <table>
+                        <thead><tr><th>姓名</th><th>部门</th><th>得分</th><th>日期</th><th>时间</th></tr></thead>
+                        <tbody id="sTable"></tbody>
+                    </table>
+                    <p id="sEmpty" style="color:#999;text-align:center;padding:20px;display:none;">暂无成绩记录</p>
+                </div>
+            </div>
+            <div id="adminR" style="display:none;">
+                <div class="card">
+                    <h2>🏆 按月排行</h2>
+                    <div class="filter-bar">
+                        <select id="rankMonth" onchange="renderRanking()"></select>
+                    </div>
+                    <div class="stats-grid" id="rankStats"></div>
+                    <table style="margin-top:15px;">
+                        <thead><tr><th>排名</th><th>姓名</th><th>部门</th><th>次数</th><th>总分</th><th>平均分</th></tr></thead>
+                        <tbody id="rankTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ==================== Supabase 配置 ====================
+    const SUPABASE_URL = 'https://jzpqzsaocaukqjlqhnex.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E';
+    const API = SUPABASE_URL + '/rest/v1';
+    const HEADERS = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+    };
+
+    // ==================== 状态 ====================
+    let userInfo = null;
+    let quizQuestions = [];
+    let allQuestions = [];
+    let allScores = [];
+
+    // ==================== API 辅助 ====================
+    async function apiGet(path, params) {
+        let url = API + path;
+        if (params) {
+            const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
+            if (qs) url += (url.includes('?') ? '&' : '?') + qs;
+        }
+        const resp = await fetch(url, { headers: HEADERS });
+        if (!resp.ok) {
+            const err = await resp.text();
+            console.error('API GET error:', resp.status, err);
+            return [];
+        }
+        return await resp.json();
+    }
+
+    async function apiPost(path, data) {
+        const resp = await fetch(API + path, {
+            method: 'POST',
+            headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+            body: JSON.stringify(data)
+        });
+        if (!resp.ok) {
+            const err = await resp.text();
+            console.error('API POST error:', resp.status, err);
+            return null;
+        }
+        return await resp.json();
+    }
+
+    // ==================== 页面切换 ====================
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if (id === 'homePage') renderHome();
+    }
+
+    function showAdmin(tab) {
+        ['adminQ','adminS','adminR'].forEach(x => document.getElementById(x).style.display = 'none');
+        ['navQ','navS','navR'].forEach(x => document.getElementById(x).classList.remove('active'));
+        
+        let key = 'Q';
+        if (tab === 'scores') key = 'S';
+        else if (tab === 'ranking') key = 'R';
+        
+        document.getElementById('admin' + key).style.display = 'block';
+        document.getElementById('nav' + key).classList.add('active');
+        
+        if (tab === 'questions') renderQTable();
+        else if (tab === 'scores') renderSTable();
+        else if (tab === 'ranking') renderRanking();
+    }
+
+    // ==================== 入口 ====================
+    document.getElementById('entryForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('enterName').value.trim();
+        const dept = document.getElementById('enterDept').value.trim();
+        if (!name || !dept) {
+            const err = document.getElementById('entryError');
+            err.textContent = '请填写姓名和部门';
+            err.style.display = 'block';
+            return;
+        }
+        userInfo = { name, dept };
+        localStorage.setItem('qsys_user', JSON.stringify(userInfo));
+        
+        // admin 直接进入管理后台
+        if (name === 'admin') {
+            localStorage.setItem('qsys_admin', '1');
+            document.getElementById('entryPage').classList.remove('active');
+            document.getElementById('homePage').classList.add('active');
+            document.getElementById('homeUserInfo').textContent = '管理员';
+            await loadData();
+            renderHome();
+            showPage('adminPage');
+            showAdmin('questions');
+        } else {
+            document.getElementById('entryPage').classList.remove('active');
+            document.getElementById('homePage').classList.add('active');
+            document.getElementById('homeUserInfo').textContent = name + '（' + dept + '）';
+            await loadData();
+            renderHome();
+        }
+    });
+
+    // ==================== 加载数据 ====================
+    async function loadData() {
+        // Load questions
+        allQuestions = await apiGet('/questions', { select: '*', limit: 1000 });
+        
+        // Load scores
+        allScores = await apiGet('/scores', { select: '*', order: 'created_at.desc', limit: 5000 });
+    }
+
+    // ==================== 首页 ====================
+    async function renderHome() {
+        const today = new Date().toISOString().split('T')[0];
+        const todayScore = allScores.find(s => s.name === userInfo.name && s.date === today);
+        
+        document.getElementById('totalQCount').textContent = allQuestions.length + ' 题';
+        
+        if (todayScore) {
+            document.getElementById('todayStatus').innerHTML = '<span class="status-done">✅ 已完成（' + todayScore.score + '分）</span>';
+            document.getElementById('homeActions').innerHTML = '<button class="btn btn-primary" disabled style="opacity:0.5;">今日已答题</button>';
+        } else {
+            document.getElementById('todayStatus').innerHTML = '<span class="status-pending">⏳ 待答题</span>';
+            document.getElementById('homeActions').innerHTML = '<button class="btn btn-primary" onclick="startQuiz()">开始答题</button>';
+        }
+    }
+
+    // ==================== 答题 ====================
+    function startQuiz() {
+        if (allQuestions.length < 20) { alert('题库不足20题'); return; }
+        
+        quizQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 20);
+        
+        let html = '';
+        quizQuestions.forEach((q, i) => {
+            html += '<div class="question">' +
+                '<div class="q-num">第 ' + (i+1) + ' 题</div>' +
+                '<div class="q-text">' + q.question_text + '</div>' +
+                '<div class="options">' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="A"> A. ' + q.option_a + '</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="B"> B. ' + q.option_b + '</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="C"> C. ' + q.option_c + '</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="D"> D. ' + q.option_d + '</label></div>' +
+                '</div></div>';
+        });
+        document.getElementById('quizForm').innerHTML = html;
+        showPage('quizPage');
+    }
+
+    async function submitQuiz() {
+        let correct = 0;
+        let results = [];
+        let allAnswered = true;
+        
+        quizQuestions.forEach((q, i) => {
+            const sel = document.querySelector('input[name="q' + q.id + '"]:checked');
+            if (!sel) {
+                allAnswered = false;
+                alert('请回答第 ' + (i+1) + ' 题');
+                return;
+            }
+            const ans = sel.value;
+            const ok = ans === q.correct_answer;
+            if (ok) correct++;
+            results.push({ num: i+1, text: q.question_text, userAns: ans, correctAns: q.correct_answer, ok, exp: q.rationale });
+        });
+        
+        if (!allAnswered) return;
+        
+        // 保存成绩到 Supabase
+        const now = new Date();
+        const scoreData = {
+            name: userInfo.name,
+            dept: userInfo.dept,
+            total: 20,
+            correct: correct,
+            score: correct,
+            date: now.toISOString().split('T')[0],
+            time: now.toTimeString().substring(0, 5)
+        };
+        
+        await apiPost('/scores', scoreData);
+        
+        // 重新加载 scores
+        allScores = await apiGet('/scores', { select: '*', order: 'created_at.desc', limit: 5000 });
+        
+        // 显示成绩
+        document.getElementById('resScore').textContent = correct + ' / 20';
+        const pass = correct >= 16;
+        document.getElementById('resDetail').innerHTML = userInfo.name + '（' + userInfo.dept + '）| 答对 ' + correct + '/20 题 | ' + (pass ? '<span class="pass">✅ 通过</span>' : '<span class="fail">❌ 未通过</span>');
+        
+        let reviewHtml = '';
+        results.forEach(r => {
+            reviewHtml += '<div class="review ' + (r.ok ? 'review-correct' : 'review-wrong') + '">' +
+                '<div class="review-header">' +
+                    '<span class="review-q">第 ' + r.num + ' 题</span>' +
+                    '<span>' + (r.ok ? '✅' : '❌') + '</span>' +
+                '</div>' +
+                '<div class="review-text">' + r.text + '</div>' +
+                (!r.ok ? '<div class="review-your">你的答案：' + r.userAns + '</div>' : '') +
+                '<div class="review-correct-ans">正确答案：' + r.correctAns + '</div>' +
+                (r.exp ? '<div class="review-explain">📖 ' + r.exp + '</div>' : '') +
+            '</div>';
+        });
+        document.getElementById('resReview').innerHTML = reviewHtml;
+        showPage('resultPage');
+    }
+
+    // ==================== 历史 ====================
+    function renderHistory() {
+        const scores = allScores.filter(s => s.name === userInfo.name).reverse();
+        const table = document.getElementById('histTable');
+        const empty = document.getElementById('histEmpty');
+        if (scores.length === 0) { table.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        table.innerHTML = scores.map(s => '<tr><td>' + s.date + '</td><td>' + s.time + '</td><td><strong>' + s.score + '</strong>/20</td><td>' + Math.round(s.score/20*100) + '%</td></tr>').join('');
+    }
+
+    // ==================== 管理后台 - 题库 ====================
+    function renderQTable() {
+        const cat = document.getElementById('qCatFilter').value;
+        const filtered = cat ? allQuestions.filter(q => q.category === cat) : allQuestions;
+        
+        const cats = [...new Set(allQuestions.map(q => q.category))].sort();
+        const sel = document.getElementById('qCatFilter');
+        const cv = sel.value;
+        sel.innerHTML = '<option value="">全部分类</option>' + cats.map(c => '<option ' + (c===cv?'selected':'') + '>' + c + '</option>').join('');
+        
+        document.getElementById('qTable').innerHTML = filtered.map(q => '<tr>' +
+            '<td>' + q.id + '</td>' +
+            '<td><span class="badge badge-success">' + q.category + '</span></td>' +
+            '<td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + q.question_text + '</td>' +
+            '<td><strong>' + q.correct_answer + '</strong></td>' +
+        '</tr>').join('');
+        
+        document.getElementById('qEmpty').style.display = filtered.length === 0 ? 'block' : 'none';
+    }
+
+    // ==================== 管理后台 - 成绩 ====================
+    function renderSTable() {
+        const nameF = document.getElementById('sNameFilter').value.toLowerCase();
+        const monthF = document.getElementById('sMonthFilter').value;
+        let f = allScores;
+        if (nameF) f = f.filter(s => (s.name||'').toLowerCase().includes(nameF) || (s.dept||'').toLowerCase().includes(nameF));
+        if (monthF) f = f.filter(s => (s.date||'').startsWith(monthF));
+        
+        document.getElementById('sTable').innerHTML = f.map(s => '<tr><td>' + s.name + '</td><td>' + (s.dept||'-') + '</td><td><strong>' + s.score + '</strong>/20</td><td>' + s.date + '</td><td>' + s.time + '</td></tr>').join('');
+        document.getElementById('sEmpty').style.display = f.length === 0 ? 'block' : 'none';
+    }
+
+    // ==================== 管理后台 - 排行 ====================
+    function renderRanking() {
+        const sel = document.getElementById('rankMonth');
+        const months = [...new Set(allScores.map(s => (s.date||'').substring(0,7)))].filter(m => m).sort().reverse();
+        const cur = sel.value || new Date().toISOString().substring(0,7);
+        sel.innerHTML = months.map(m => '<option ' + (m===cur?'selected':'') + '>' + m + '</option>').join('');
+        
+        const m = sel.value || months[0];
+        if (!m) {
+            document.getElementById('rankStats').innerHTML = '';
+            document.getElementById('rankTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>';
+            return;
+        }
+        
+        const ms = allScores.filter(s => (s.date||'').startsWith(m));
+        const groups = {};
+        ms.forEach(s => {
+            if (!groups[s.name]) groups[s.name] = {name:s.name, dept:s.dept, count:0, correct:0};
+            groups[s.name].count++;
+            groups[s.name].correct += s.correct;
+        });
+        const ranking = Object.values(groups).sort((a,b) => b.correct - a.correct);
+        
+        const totalUsers = ranking.length;
+        const totalQuizzes = ranking.reduce((s,u) => s + u.count, 0);
+        const totalScores = ranking.reduce((s,u) => s + u.correct, 0);
+        const avgScore = totalQuizzes > 0 ? (totalScores / totalQuizzes).toFixed(1) : 0;
+        
+        document.getElementById('rankStats').innerHTML =
+            '<div class="stat-card"><div class="stat-num">' + totalUsers + '</div><div class="stat-label">参与人数</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + totalQuizzes + '</div><div class="stat-label">答题次数</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + totalScores + '</div><div class="stat-label">总得分</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + avgScore + '</div><div class="stat-label">平均分数</div></div>';
+        
+        document.getElementById('rankTable').innerHTML = ranking.length === 0
+            ? '<tr><td colspan="6" style="text-align:center;color:#999;padding:20px;">暂无数据</td></tr>'
+            : ranking.map((r, i) => '<tr><td>' + (i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1) + '</td><td>' + r.name + '</td><td>' + (r.dept||'-') + '</td><td>' + r.count + '</td><td><strong>' + r.correct + '</strong></td><td><strong>' + (r.correct/r.count).toFixed(1) + '</strong></td></tr>').join('');
+    }
+
+    // ==================== 启动 ====================
+    (async function() {
+        const saved = localStorage.getItem('qsys_user');
+        if (saved) {
+            userInfo = JSON.parse(saved);
+            await loadData();
+            document.getElementById('entryPage').classList.remove('active');
+            document.getElementById('homePage').classList.add('active');
+            document.getElementById('homeUserInfo').textContent = userInfo.name + '（' + userInfo.dept + '）';
+            renderHome();
+        }
+    })();
+    </script>
+</body>
+</html>
