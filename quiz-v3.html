@@ -297,7 +297,14 @@
             console.error('API POST error:', resp.status, err);
             return null;
         }
-        return await resp.json();
+        // Handle 204 No Content or empty body
+        const text = await resp.text();
+        if (!text) return { success: true };
+        try {
+            return JSON.parse(text);
+        } catch {
+            return { success: true };
+        }
     }
 
     // ==================== 页面切换 ====================
