@@ -406,12 +406,12 @@
     async function submitQuiz() {
         let correct = 0;
         let results = [];
-        let allAnswered = true;
         
-        quizQuestions.forEach((q, i) => {
+        // 检查所有题是否已答
+        for (let i = 0; i < quizQuestions.length; i++) {
+            const q = quizQuestions[i];
             const sel = document.querySelector('input[name="q' + q.id + '"]:checked');
             if (!sel) {
-                allAnswered = false;
                 alert('请回答第 ' + (i+1) + ' 题');
                 return;
             }
@@ -419,9 +419,15 @@
             const ok = ans === q.correct_answer;
             if (ok) correct++;
             results.push({ num: i+1, text: q.question_text, userAns: ans, correctAns: q.correct_answer, ok, exp: q.rationale });
-        });
+        }
         
-        if (!allAnswered) return;
+        // 检查今日是否已答（去重）
+        const today = new Date().toISOString().split('T')[0];
+        const existing = allScores.find(s => s.name === userInfo.name && s.date === today);
+        if (existing) {
+            alert('今日已答题，成绩：' + existing.score + '分');
+            return;
+        }
         
         // 保存成绩到 Supabase
         const now = new Date();
@@ -431,11 +437,15 @@
             total: 20,
             correct: correct,
             score: correct,
-            date: now.toISOString().split('T')[0],
+            date: today,
             time: now.toTimeString().substring(0, 5)
         };
         
-        await apiPost('/scores', scoreData);
+        const result = await apiPost('/scores', scoreData);
+        if (!result) {
+            alert('成绩保存失败，请刷新重试');
+            return;
+        }
         
         // 重新加载 scores
         allScores = await apiGet('/scores', { select: '*', order: 'created_at.desc', limit: 5000 });
