@@ -162,7 +162,7 @@
         </div>
         <div class="container">
             <form id="quizForm"></form>
-            <button class="btn btn-primary" onclick="submitQuiz()" style="margin-top:15px;">提交答卷</button>
+            <button class="btn btn-primary" id="submitBtn" onclick="submitQuiz()" style="margin-top:15px;">提交答卷</button>
         </div>
     </div>
 
@@ -404,6 +404,11 @@
     }
 
     async function submitQuiz() {
+        // 禁用按钮防止重复点击
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = '提交中...';
+        
         let correct = 0;
         let results = [];
         
@@ -412,6 +417,8 @@
             const q = quizQuestions[i];
             const sel = document.querySelector('input[name="q' + q.id + '"]:checked');
             if (!sel) {
+                btn.disabled = false;
+                btn.textContent = '提交答卷';
                 alert('请回答第 ' + (i+1) + ' 题');
                 return;
             }
@@ -425,6 +432,8 @@
         const today = new Date().toISOString().split('T')[0];
         const existing = allScores.find(s => s.name === userInfo.name && s.date === today);
         if (existing) {
+            btn.disabled = false;
+            btn.textContent = '提交答卷';
             alert('今日已答题，成绩：' + existing.score + '分');
             return;
         }
@@ -443,6 +452,8 @@
         
         const result = await apiPost('/scores', scoreData);
         if (!result) {
+            btn.disabled = false;
+            btn.textContent = '提交答卷';
             alert('成绩保存失败，请刷新重试');
             return;
         }
