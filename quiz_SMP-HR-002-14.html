@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>培训考试 - SMP-HR-002-14 员工培训管理程序</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { text-align: center; color: #051C2C; margin-bottom: 10px; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .info-form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .info-form label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .info-form input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 18px; color: #051C2C; border-bottom: 2px solid #051C2C; padding-bottom: 8px; margin-bottom: 20px; }
+        .question { margin-bottom: 20px; padding: 15px; background: #fafafa; border-radius: 6px; }
+        .question-text { font-size: 15px; color: #333; margin-bottom: 12px; line-height: 1.6; }
+        .options { padding-left: 10px; }
+        .option { margin-bottom: 8px; }
+        .option label { cursor: pointer; padding: 8px 12px; border-radius: 4px; display: block; transition: background 0.2s; }
+        .option label:hover { background: #e8f4fc; }
+        .option input[type="radio"] { margin-right: 8px; }
+        .fill-blank input { border: none; border-bottom: 2px solid #051C2C; padding: 4px 8px; font-size: 14px; width: 150px; outline: none; background: transparent; }
+        .btn-submit { display: block; width: 100%; padding: 15px; background: #051C2C; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 30px; }
+        .btn-submit:hover { background: #006BA6; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+        .result { display: none; }
+        .score-card { text-align: center; padding: 30px; background: linear-gradient(135deg, #051C2C, #006BA6); color: white; border-radius: 12px; margin-bottom: 30px; }
+        .score-number { font-size: 64px; font-weight: bold; margin: 20px 0; }
+        .score-status { font-size: 24px; margin-bottom: 10px; }
+        .score-pass { color: #007A53; }
+        .score-fail { color: #C62828; }
+        .review-section { margin-top: 30px; }
+        .review-item { padding: 15px; margin-bottom: 15px; border-radius: 6px; }
+        .review-correct { background: #e8f5e9; border-left: 4px solid #007A53; }
+        .review-wrong { background: #ffebee; border-left: 4px solid #C62828; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .review-qnum { font-weight: bold; color: #333; }
+        .review-icon { font-size: 20px; }
+        .review-answer { color: #007A53; font-size: 14px; margin-top: 5px; }
+        .review-your { color: #C62828; font-size: 14px; margin-top: 3px; }
+        .source-text { background: #fff; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 13px; color: #666; border: 1px dashed #ccc; }
+        .btn-restart { display: block; width: 100%; padding: 15px; background: #007A53; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quizPage">
+            <h1>📋 培训考试</h1>
+            <p class="subtitle">SMP-HR-002-14 员工培训管理程序 | 总分 100 分 | 及格线 80 分</p>
+
+            <div class="info-form">
+                <label>姓名</label>
+                <input type="text" id="name" placeholder="请输入姓名">
+                <label>部门</label>
+                <input type="text" id="department" placeholder="请输入部门">
+            </div>
+
+            <form id="quizForm">
+                <div class="section">
+                    <div class="section-title">一、选择题（每题 4 分，共 40 分）</div>
+                    <div id="mcQuestions"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">二、判断题（每题 4 分，共 40 分）</div>
+                    <div id="tfQuestions"></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">三、填空题（每题 4 分，共 20 分）</div>
+                    <div id="fillQuestions"></div>
+                </div>
+                <button type="button" class="btn-submit" onclick="submitQuiz()">提交答卷</button>
+            </form>
+        </div>
+
+        <div id="resultPage" class="result">
+            <h1>📊 考试成绩</h1>
+            <div class="score-card">
+                <div class="score-status" id="scoreStatus"></div>
+                <div class="score-number" id="scoreNumber"></div>
+                <div id="scoreDetail"></div>
+            </div>
+            <div class="review-section" id="reviewSection"></div>
+            <button class="btn-restart" onclick="restartQuiz()">重新答题</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            mc: [
+        {
+                "text": "员工培训管理程序的审核间隔是多久？",
+                "options": [
+                        "12个月",
+                        "24个月",
+                        "36个月",
+                        "48个月"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，第一节：审核间隔36个月"
+        },
+        {
+                "text": "新员工、岗位变动的员工和复岗的员工离开工作岗位多长时间以上需要重新培训？",
+                "options": [
+                        "30天",
+                        "60天",
+                        "90天",
+                        "180天"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.1.2：长时间（90天以上）离开工作岗位"
+        },
+        {
+                "text": "培训考核笔试成绩多少分为合格？",
+                "options": [
+                        "60分",
+                        "70分",
+                        "80分",
+                        "90分"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.1.9：笔试成绩80分及以上为合格"
+        },
+        {
+                "text": "培训考核笔试成绩多少分为优秀？",
+                "options": [
+                        "85分",
+                        "90分",
+                        "95分",
+                        "100分"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.1.9：95分及以上为优秀"
+        },
+        {
+                "text": "培训师应具备什么学历及以上？",
+                "options": [
+                        "中专",
+                        "大专",
+                        "本科",
+                        "研究生"
+                ],
+                "answer": "B",
+                "source": "SMP-HR-002/14，6.1.5.1：培训师应具备大专及以上学历"
+        },
+        {
+                "text": "培训师资质多久确认一次？",
+                "options": [
+                        "1年",
+                        "2年",
+                        "3年",
+                        "5年"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.1.5.1：培训师资质每3年确认一次"
+        },
+        {
+                "text": "公司级培训的培训师一般由谁担任？",
+                "options": [
+                        "部门负责人",
+                        "技术骨干人员",
+                        "各系统第一负责人、外聘专家",
+                        "SMP起草者"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.1.5.2：公司级培训的培训师一般由各系统第一负责人、外聘专家、技术骨干等担任"
+        },
+        {
+                "text": "各部门应在每年什么时间前提交下一年度部门级培训计划？",
+                "options": [
+                        "1月1日前",
+                        "1月10日前",
+                        "1月15日前",
+                        "1月20日前"
+                ],
+                "answer": "B",
+                "source": "SMP-HR-002/14，6.3.2.1：每年1月10日前，各部门制定下一年度部门级培训计划"
+        },
+        {
+                "text": "QA及人事行政部应在每年什么时间前制定下年度公司级培训计划？",
+                "options": [
+                        "1月5日前",
+                        "1月10日前",
+                        "1月15日前",
+                        "1月20日前"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.3.2.1：每年1月15日前，由QA及人事行政部制定下年度公司级培训计划"
+        },
+        {
+                "text": "员工培训档案应保管至该员工离开企业后多少年？",
+                "options": [
+                        "2年",
+                        "3年",
+                        "5年",
+                        "10年"
+                ],
+                "answer": "C",
+                "source": "SMP-HR-002/14，6.3.4.4：保管至该员工离开本企业5年"
+        }
+],
+            tf: [
+        {
+                "text": "新员工完成所有培训内容并考核合格后即可独立上岗，无需签订《员工职责确认书》。",
+                "answer": "错误",
+                "source": "SMP-HR-002/14，6.2.1.4：确认考核合格后需签订《员工职责确认书》"
+        },
+        {
+                "text": "每年至少组织一次GMP、数据完整性相关文件或法规的培训。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.3.1.1：每年至少组织一次GMP、数据完整性相关文件或法规的培训"
+        },
+        {
+                "text": "每年至少进行一次SOP巩固培训。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.3.1.1：每年至少进行一次SOP巩固培训"
+        },
+        {
+                "text": "岗位级培训的培训师只能由部门负责人担任。",
+                "answer": "错误",
+                "source": "SMP-HR-002/14，6.1.5.4：岗位级培训的培训师一般由部门负责人、技术骨干人员、相关SMP/SOP起草者及经培训考核允许上岗的人员等担任"
+        },
+        {
+                "text": "新员工在接受部门级和班组级培训前应按照《数据完整性管理程序》签署遵守数据完整性原则的承诺书。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.2.1.4：新员工在接受部门级和班组级培训前应按照《数据完整性管理程序》的相关要求签署遵守数据完整性原则的承诺书"
+        },
+        {
+                "text": "年度培训计划落实时，本年12月15日后和次年1月15日前尽量不要安排培训。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.3.2.1：本年12月15日后和次年1月15日前尽量不要安排培训"
+        },
+        {
+                "text": "转岗员工参照新员工培训进行培训及考核确认，经确认考核合格后方可独立进行本岗位操作。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.3.1.3：转岗员工参照6.2.1.4进行培训及考核确认"
+        },
+        {
+                "text": "所有员工参加外部培训项目，经部门同意后即可参加培训及报销相关费用。",
+                "answer": "错误",
+                "source": "SMP-HR-002/14，6.4.1：所有员工参加外部培训项目，经部门、人事行政部、公司领导审批同意后，方可参加培训及报销相关费用"
+        },
+        {
+                "text": "由外部培训机构颁发的培训证书原件由人事行政部代为保管，复印件交由本人留存。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.4.3：由外部培训机构颁发的培训证书原件由人事行政部代为保管，副件交由本人留存"
+        },
+        {
+                "text": "各部门每月月初5个工作日内将上月部门培训记录核查无误后交至人事行政部。",
+                "answer": "正确",
+                "source": "SMP-HR-002/14，6.3.2.3：各部门每月月初5个工作日内将上月部门培训记录核查无误后交至人事行政部"
+        }
+],
+            fill: [
+        {
+                "text": "培训方式采用三级培训方式：______培训、______培训、______培训。",
+                "answer": "公司级，部门级，岗位级",
+                "source": "SMP-HR-002/14，6.1.4：采用三级培训方式：公司级培训、部门级培训、岗位级培训"
+        },
+        {
+                "text": "培训考核：笔试成绩设置为满分______分，笔试成绩______分及以上为合格，______分及以上为良好，______分及以上为优秀。",
+                "answer": "100，80，90，95",
+                "source": "SMP-HR-002/14，6.1.9：笔试成绩设置为满分100分，笔试成绩80分及以上为合格，90分及以上为良好，95分及以上为优秀"
+        },
+        {
+                "text": "培训师应具备大专及以上学历、有______年以上相关工作背景、具有专业的培训或授课经验。",
+                "answer": "1~2",
+                "source": "SMP-HR-002/14，6.1.5.1：培训师应具备大专及以上学历、有1~2年以上相关工作背景"
+        },
+        {
+                "text": "每年______前，各部门/车间应对本年度培训情况进行总结，按照《年度培训总结报告》的格式填写。",
+                "answer": "12月31日",
+                "source": "SMP-HR-002/14，6.3.3.4：每年12月31日前，各部门/车间应对本年度培训情况进行总结"
+        },
+        {
+                "text": "通常情况下，每年______前，各部门将上年度员工培训记录整理后交至人事行政部统一归档。",
+                "answer": "2月份",
+                "source": "SMP-HR-002/14，6.3.4.1：每年2月份前，各部门将上年度员工培训记录整理后交至人事行政部统一归档"
+        }
+]
+        };
+
+        function renderQuestions() {
+            let mcHtml = '';
+            questions.mc.forEach((q, i) => {
+                mcHtml += `<div class="question">
+                    <div class="question-text">${i+1}. ${q.text}</div>
+                    <div class="options">
+                        ${q.options.map((opt, j) => `<div class="option"><label><input type="radio" name="mc${i}" value="${String.fromCharCode(65+j)}"> ${opt}</label></div>`).join('')}
+                    </div>
+                </div>`;
+            });
+            document.getElementById('mcQuestions').innerHTML = mcHtml;
+
+            let tfHtml = '';
+            questions.tf.forEach((q, i) => {
+                tfHtml += `<div class="question">
+                    <div class="question-text">${i+1}. ${q.text}</div>
+                    <div class="options">
+                        <div class="option"><label><input type="radio" name="tf${i}" value="正确"> 正确</label></div>
+                        <div class="option"><label><input type="radio" name="tf${i}" value="错误"> 错误</label></div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('tfQuestions').innerHTML = tfHtml;
+
+            let fillHtml = '';
+            questions.fill.forEach((q, i) => {
+                const displayText = q.text.replace('______', `<input type="text" id="fill${i}" placeholder="请填写答案">`);
+                fillHtml += `<div class="question">
+                    <div class="question-text">${i+1}. ${displayText}</div>
+                </div>`;
+            });
+            document.getElementById('fillQuestions').innerHTML = fillHtml;
+        }
+
+        function submitQuiz() {
+            const name = document.getElementById('name').value.trim();
+            const department = document.getElementById('department').value.trim();
+            if (!name || !department) { alert('请先填写姓名和部门！'); return; }
+
+            let score = 0, correct = 0, total = questions.mc.length + questions.tf.length + questions.fill.length;
+            let reviews = [];
+
+            questions.mc.forEach((q, i) => {
+                const sel = document.querySelector(`input[name="mc${i}"]:checked`);
+                const ua = sel ? sel.value : '';
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({ type:'选择题', num:i+1, text:q.text, userAnswer:ua||'未作答', correctAnswer:q.answer, isCorrect:ok, source:q.source });
+            });
+
+            questions.tf.forEach((q, i) => {
+                const sel = document.querySelector(`input[name="tf${i}"]:checked`);
+                const ua = sel ? sel.value : '';
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({ type:'判断题', num:i+1, text:q.text, userAnswer:ua||'未作答', correctAnswer:q.answer, isCorrect:ok, source:q.source });
+            });
+
+            questions.fill.forEach((q, i) => {
+                const ua = document.getElementById(`fill${i}`).value.trim();
+                const ok = ua === q.answer;
+                if (ok) { score += 4; correct++; }
+                reviews.push({ type:'填空题', num:i+1, text:q.text, userAnswer:ua||'未作答', correctAnswer:q.answer, isCorrect:ok, source:q.source });
+            });
+
+            showResult(name, department, score, correct, total, reviews);
+        }
+
+        function showResult(name, department, score, correct, total, reviews) {
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('resultPage').style.display = 'block';
+            const pass = score >= 80;
+            document.getElementById('scoreStatus').innerHTML = pass ? '✅ 恭喜通过！' : '❌ 未通过';
+            document.getElementById('scoreStatus').className = pass ? 'score-pass' : 'score-fail';
+            document.getElementById('scoreNumber').textContent = score + ' 分';
+            document.getElementById('scoreDetail').textContent = `${name}（${department}）| 答对 ${correct}/${total} 题`;
+
+            let reviewHtml = '<h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>';
+            reviews.forEach(r => {
+                reviewHtml += `<div class="review-item ${r.isCorrect ? 'review-correct' : 'review-wrong'}">
+                    <div class="review-header">
+                        <span class="review-qnum">${r.type} ${r.num}</span>
+                        <span class="review-icon">${r.isCorrect ? '✅' : '❌'}</span>
+                    </div>
+                    <div style="margin-bottom:8px;">${r.text}</div>
+                    ${!r.isCorrect ? `<div class="review-your">你的答案：${r.userAnswer}</div>` : ''}
+                    <div class="review-answer">正确答案：${r.correctAnswer}</div>
+                    <div class="source-text">📖 源文件原文：${r.source}</div>
+                </div>`;
+            });
+            document.getElementById('reviewSection').innerHTML = reviewHtml;
+        }
+
+        function restartQuiz() {
+            document.getElementById('quizPage').style.display = 'block';
+            document.getElementById('resultPage').style.display = 'none';
+            document.getElementById('quizForm').reset();
+        }
+
+        renderQuestions();
+    </script>
+</body>
+</html>
