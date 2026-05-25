@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兽药二维码管理程序培训考试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, "Microsoft YaHei", sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .entry-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #051C2C, #006BA6); }
+        .entry-box { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .entry-box h1 { text-align: center; color: #051C2C; font-size: 24px; margin-bottom: 5px; }
+        .entry-box .sub { text-align: center; color: #999; margin-bottom: 25px; font-size: 14px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #333; font-weight: bold; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+        .form-group input:focus { outline: none; border-color: #006BA6; }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: #051C2C; color: white; }
+        .btn-primary:hover { background: #006BA6; }
+        .btn-success { background: #007A53; color: white; }
+        .error { background: #ffebee; color: #C62828; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+        
+        .topbar { background: #051C2C; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { font-size: 18px; }
+        .topbar .right { font-size: 14px; }
+        .topbar .right span { margin-left: 15px; cursor: pointer; opacity: 0.8; }
+        .topbar .right span:hover { opacity: 1; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #051C2C; margin-bottom: 15px; font-size: 18px; }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #666; }
+        .info-value { color: #333; font-weight: bold; }
+        .status-done { color: #007A53; }
+        .status-pending { color: #D46A00; }
+        
+        .question { background: white; border-radius: 12px; padding: 25px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .q-num { color: #006BA6; font-weight: bold; margin-bottom: 10px; }
+        .q-text { color: #333; font-size: 16px; line-height: 1.6; margin-bottom: 15px; }
+        .options { padding-left: 10px; }
+        .option { margin-bottom: 10px; }
+        .option label { cursor: pointer; padding: 10px 15px; border-radius: 8px; display: block; transition: background 0.2s; border: 1px solid #eee; }
+        .option label:hover { background: #e8f4fc; }
+        .option input { margin-right: 10px; }
+        
+        .score-card { background: linear-gradient(135deg, #051C2C, #006BA6); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 20px; }
+        .score-big { font-size: 64px; font-weight: bold; margin: 15px 0; }
+        .pass { color: #69F0AE; }
+        .fail { color: #FF5252; }
+        .review { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .review-correct { border-left: 4px solid #007A53; }
+        .review-wrong { border-left: 4px solid #C62828; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .review-q { font-weight: bold; color: #333; }
+        .review-text { color: #333; margin-bottom: 8px; }
+        .review-your { color: #C62828; font-size: 14px; }
+        .review-correct-ans { color: #007A53; font-size: 14px; }
+        .review-explain { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 8px; font-size: 13px; color: #666; }
+    </style>
+</head>
+<body>
+    <!-- 入口页 -->
+    <div class="page active" id="entryPage">
+        <div class="entry-page">
+            <div class="entry-box">
+                <h1>📋 兽药二维码管理程序培训考试</h1>
+                <p class="sub">25 题 | 10 选择 +10 判断 +5 填空 | 总分 100 分</p>
+                <div class="error" id="entryError"></div>
+                <form id="entryForm">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" id="enterName" placeholder="请输入姓名" required>
+                    </div>
+                    <div class="form-group">
+                        <label>部门</label>
+                        <input type="text" id="enterDept" placeholder="请输入部门" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">开始答题</button>
+                </form>
+                <p style="text-align:center;margin-top:15px;font-size:13px;color:#999;">
+                    每题 4 分 | 及格线 80 分 | 提交后查看成绩
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
+    <div class="page" id="quizPage">
+        <div class="topbar">
+            <h1>📝 答题中（共 25 题）</h1>
+            <div class="right"><span onclick="showPage('entryPage')">返回首页</span></div>
+        </div>
+        <div class="container">
+            <form id="quizForm"></form>
+            <button class="btn btn-primary" id="submitBtn" onclick="submitQuiz()" style="margin-top:15px;">提交答卷</button>
+        </div>
+    </div>
+
+    <!-- 成绩页 -->
+    <div class="page" id="resultPage">
+        <div class="container">
+            <div class="score-card">
+                <div style="font-size:18px;">📊 考试成绩</div>
+                <div class="score-big" id="resScore">-</div>
+                <div id="resDetail" style="font-size:16px;opacity:0.9;"></div>
+            </div>
+            <h2 style="margin-bottom:15px;color:#333;">📝 逐题解析</h2>
+            <div id="resReview"></div>
+            <button class="btn btn-success" onclick="showPage('entryPage')" style="margin-top:15px;">返回首页</button>
+        </div>
+    </div>
+
+    <script>
+    // ==================== Supabase 配置 ====================
+    const SUPABASE_URL = 'https://jzpqzsaocaukqjlqhnex.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E';
+    const API = SUPABASE_URL + '/rest/v1';
+    const HEADERS = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+    };
+
+    // ==================== 状态 ====================
+    let userInfo = null;
+    let quizQuestions = [];
+    let allQuestions = [];
+
+    // ==================== API 辅助 ====================
+    async function apiGet(path, params) {
+        let url = API + path;
+        if (params) {
+            const qs = Object.entries(params).map(([k,v]) => k + '=' + encodeURIComponent(v)).join('&');
+            if (qs) url += (url.includes('?') ? '&' : '?') + qs;
+        }
+        const resp = await fetch(url, { headers: HEADERS });
+        if (!resp.ok) {
+            const err = await resp.text();
+            console.error('API GET error:', resp.status, err);
+            return [];
+        }
+        return await resp.json();
+    }
+
+    async function apiPost(path, data) {
+        const resp = await fetch(API + path, {
+            method: 'POST',
+            headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+            body: JSON.stringify(data)
+        });
+        if (!resp.ok) {
+            const err = await resp.text();
+            console.error('API POST error:', resp.status, err);
+            return null;
+        }
+        const text = await resp.text();
+        if (!text) return { success: true };
+        try {
+            return JSON.parse(text);
+        } catch {
+            return { success: true };
+        }
+    }
+
+    // ==================== 页面切换 ====================
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // ==================== 入口 ====================
+    document.getElementById('entryForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('enterName').value.trim();
+        const dept = document.getElementById('enterDept').value.trim();
+        if (!name || !dept) {
+            const err = document.getElementById('entryError');
+            err.textContent = '请填写姓名和部门';
+            err.style.display = 'block';
+            return;
+        }
+        userInfo = { name, dept };
+        
+        // 加载题目
+        allQuestions = await apiGet('/questions', { 
+            select: '*', 
+            category: 'eq.SMP-QA-201-04 兽药二维码管理程序',
+            limit: 100 
+        });
+        
+        if (allQuestions.length < 25) {
+            alert('题库不足 25 题，当前只有 ' + allQuestions.length + ' 题');
+            return;
+        }
+        
+        // 随机抽题
+        quizQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, 25);
+        
+        // 渲染答题页
+        let html = '';
+        quizQuestions.forEach((q, i) => {
+            html += '<div class="question">' +
+                '<div class="q-num">第 ' + (i+1) + ' 题 <span style="color:#999;font-size:12px;">(' + getQuestionTypeName(q.question_type) + ')</span></div>' +
+                '<div class="q-text">' + q.question_text + '</div>';
+            
+            if (q.question_type === 'choice') {
+                html += '<div class="options">' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="A"> A. ' + q.option_a + '</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="B"> B. ' + q.option_b + '</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="C"> C. ' + q.option_c + '</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="D"> D. ' + q.option_d + '</label></div>' +
+                '</div>';
+            } else if (q.question_type === 'true_false') {
+                html += '<div class="options">' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="正确"> 正确</label></div>' +
+                    '<div class="option"><label><input type="radio" name="q' + q.id + '" value="错误"> 错误</label></div>' +
+                '</div>';
+            } else if (q.question_type === 'fill_blank') {
+                html += '<div style="padding:10px;">' +
+                    '<input type="text" name="q' + q.id + '" placeholder="请输入答案" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;">' +
+                '</div>';
+            }
+            html += '</div>';
+        });
+        document.getElementById('quizForm').innerHTML = html;
+        showPage('quizPage');
+    });
+    
+    function getQuestionTypeName(type) {
+        const types = {
+            'choice': '选择题',
+            'true_false': '判断题',
+            'fill_blank': '填空题'
+        };
+        return types[type] || '选择题';
+    }
+
+    // ==================== 提交 ====================
+    async function submitQuiz() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = '提交中...';
+        
+        let correct = 0;
+        let results = [];
+        
+        // 检查所有题是否已答
+        for (let i = 0; i < quizQuestions.length; i++) {
+            const q = quizQuestions[i];
+            let ans = '';
+            let ok = false;
+            
+            if (q.question_type === 'fill_blank') {
+                const input = document.querySelector('input[name="q' + q.id + '"]');
+                if (!input || !input.value.trim()) {
+                    btn.disabled = false;
+                    btn.textContent = '提交答卷';
+                    alert('请回答第 ' + (i+1) + ' 题');
+                    return;
+                }
+                ans = input.value.trim();
+                const correctAnswers = (q.fill_answer || q.correct_answer || '').split('/').map(a => a.trim());
+                ok = correctAnswers.some(a => a.toLowerCase() === ans.toLowerCase());
+            } else {
+                const sel = document.querySelector('input[name="q' + q.id + '"]:checked');
+                if (!sel) {
+                    btn.disabled = false;
+                    btn.textContent = '提交答卷';
+                    alert('请回答第 ' + (i+1) + ' 题');
+                    return;
+                }
+                ans = sel.value;
+                ok = ans === q.correct_answer;
+            }
+            
+            if (ok) correct++;
+            results.push({ num: i+1, text: q.question_text, userAns: ans, correctAns: q.correct_answer, ok, exp: q.rationale, type: q.question_type });
+        }
+        
+        // 保存成绩
+        const today = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const score = correct * 4; // 每题 4 分
+        
+        const scoreData = {
+            name: userInfo.name,
+            dept: userInfo.dept,
+            total: 25,
+            correct: correct,
+            score: score,
+            date: today,
+            time: now.toTimeString().substring(0, 5)
+        };
+        
+        const result = await apiPost('/scores', scoreData);
+        if (!result) {
+            btn.disabled = false;
+            btn.textContent = '提交答卷';
+            alert('成绩保存失败，请刷新重试');
+            return;
+        }
+        
+        // 记录答题历史
+        for (let r of results) {
+            await apiPost('/user_answer_history', {
+                user_name: userInfo.name,
+                question_id: quizQuestions[r.num - 1].id,
+                answer_time: new Date().toISOString(),
+                is_correct: r.ok,
+                score: r.ok ? 4 : 0
+            });
+        }
+        
+        // 记录错题
+        const wrongResults = results.filter(r => !r.ok);
+        for (let r of wrongResults) {
+            const qId = quizQuestions[r.num - 1].id;
+            const existing = await apiGet('/user_wrong_questions', {
+                user_name: 'eq.' + userInfo.name,
+                question_id: 'eq.' + qId
+            });
+            
+            if (existing.length > 0) {
+                const existingRecord = existing[0];
+                await fetch(API + '/user_wrong_questions?id=eq.' + existingRecord.id, {
+                    method: 'PATCH',
+                    headers: HEADERS,
+                    body: JSON.stringify({
+                        wrong_count: existingRecord.wrong_count + 1,
+                        last_wrong_time: new Date().toISOString()
+                    })
+                });
+            } else {
+                await apiPost('/user_wrong_questions', {
+                    user_name: userInfo.name,
+                    question_id: qId,
+                    wrong_count: 1,
+                    last_wrong_time: new Date().toISOString()
+                });
+            }
+        }
+        
+        // 显示成绩
+        document.getElementById('resScore').textContent = score + ' / 100';
+        const pass = score >= 80;
+        document.getElementById('resDetail').innerHTML = userInfo.name + '（' + userInfo.dept + '）| 答对 ' + correct + '/25 题 | ' + (pass ? '<span class="pass">✅ 通过</span>' : '<span class="fail">❌ 未通过</span>');
+        
+        let reviewHtml = '';
+        results.forEach(r => {
+            const correctAnswer = r.type === 'fill_blank' ? (quizQuestions[r.num-1].fill_answer || r.correctAns) : r.correctAns;
+            reviewHtml += '<div class="review ' + (r.ok ? 'review-correct' : 'review-wrong') + '">' +
+                '<div class="review-header">' +
+                    '<span class="review-q">第 ' + r.num + ' 题</span>' +
+                    '<span>' + (r.ok ? '✅' : '❌') + '</span>' +
+                '</div>' +
+                '<div class="review-text">' + r.text + '</div>' +
+                (!r.ok ? '<div class="review-your">你的答案：' + r.userAns + '</div>' : '') +
+                '<div class="review-correct-ans">正确答案：' + correctAnswer + '</div>' +
+                (r.exp ? '<div class="review-explain">📖 ' + r.exp + '</div>' : '') +
+            '</div>';
+        });
+        document.getElementById('resReview').innerHTML = reviewHtml;
+        showPage('resultPage');
+    }
+    </script>
+</body>
+</html>
