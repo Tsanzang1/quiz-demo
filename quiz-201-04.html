@@ -298,7 +298,27 @@
             time: now.toTimeString().substring(0, 5)
         };
         
-        const result = await apiPost('/scores', scoreData);
+        // 检查是否已提交
+        const existing = await apiGet('/scores', {
+            name: 'eq.' + userInfo.name,
+            date: 'eq.' + today
+        });
+        
+        let result;
+        if (existing.length > 0) {
+            // 更新已有记录
+            const existingId = existing[0].id;
+            const resp = await fetch(API + '/scores?id=eq.' + existingId, {
+                method: 'PATCH',
+                headers: HEADERS,
+                body: JSON.stringify(scoreData)
+            });
+            result = resp.ok ? { success: true } : null;
+        } else {
+            // 新增记录
+            result = await apiPost('/scores', scoreData);
+        }
+        
         if (!result) {
             btn.disabled = false;
             btn.textContent = '提交答卷';
