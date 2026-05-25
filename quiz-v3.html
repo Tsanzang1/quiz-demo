@@ -126,6 +126,7 @@
             <div class="right">
                 <span id="homeUserInfo"></span>
                 <span onclick="showPage('historyPage'); renderHistory();">📊 历史</span>
+                <span onclick="showPage('wrongPage'); renderWrongQuestions();">📝 错题</span>
                 <span onclick="showPage('adminPage'); showAdmin('questions');">🔧 管理</span>
                 <span onclick="localStorage.removeItem('qsys_admin'); alert('已退出管理后台');">退出管理</span>
             </div>
@@ -193,6 +194,21 @@
                     <tbody id="histTable"></tbody>
                 </table>
                 <p id="histEmpty" style="color:#999;text-align:center;padding:20px;display:none;">暂无成绩记录</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错题本 -->
+    <div class="page" id="wrongPage">
+        <div class="topbar">
+            <h1>📝 我的错题本</h1>
+            <div class="right"><span onclick="showPage('homePage')">返回首页</span></div>
+        </div>
+        <div class="container">
+            <div class="card">
+                <h2>📝 我的错题本</h2>
+                <div id="wrongList"></div>
+                <p id="wrongEmpty" style="color:#999;text-align:center;padding:20px;display:none;">暂无错题记录</p>
             </div>
         </div>
     </div>
@@ -269,6 +285,7 @@
     let quizQuestions = [];
     let allQuestions = [];
     let allScores = [];
+    let answerHistory = []; // 答题历史
 
     // ==================== API 辅助 ====================
     async function apiGet(path, params) {
@@ -370,6 +387,17 @@
         
         // Load scores
         allScores = await apiGet('/scores', { select: '*', order: 'created_at.desc', limit: 5000 });
+        
+        // Load answer history (for 2-week dedup)
+        if (userInfo && userInfo.name !== 'admin') {
+            const twoWeeksAgo = new Date();
+            twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+            answerHistory = await apiGet('/user_answer_history', { 
+                select: '*', 
+                user_name: 'eq.' + userInfo.name,
+                answer_time: 'gte.' + twoWeeksAgo.toISOString()
+            });
+        }
     }
 
     // ==================== 首页 ====================
@@ -392,7 +420,18 @@
     function startQuiz() {
         if (allQuestions.length < 20) { alert('题库不足20题'); return; }
         
-        quizQuestions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, 20);
+        // 获取最近2周答过的题ID
+        const recentQuestionIds = new Set(answerHistory.map(h => h.question_id));
+        
+        // 排除最近2周答过的题
+        let availableQuestions = allQuestions.filter(q => !recentQuestionIds.has(q.id));
+        
+        // 如果可用题不足20题，从全部题库中随机抽
+        if (availableQuestions.length < 20) {
+            availableQuestions = allQuestions;
+        }
+        
+        quizQuestions = availableQuestions.sort(() => Math.random() - 0.5).slice(0, 20);
         
         let html = '';
         quizQuestions.forEach((q, i) => {
@@ -468,6 +507,52 @@
         // 重新加载 scores
         allScores = await apiGet('/scores', { select: '*', order: 'created_at.desc', limit: 5000 });
         
+        // 记录答题历史到 Supabase
+        for (let r of results) {
+            await apiPost('/user_answer_history', {
+                user_name: userInfo.name,
+                question_id: quizQuestions[r.num - 1].id,
+                answer_time: new Date().toISOString(),
+                is_correct: r.ok,
+                score: r.ok ? 1 : 0
+            });
+        }
+        
+        // 记录错题到 Supabase
+        const wrongResults = results.filter(r => !r.ok);
+        for (let r of wrongResults) {
+            const qId = quizQuestions[r.num - 1].id;
+            // 先检查是否已有错题记录
+            const existing = await apiGet('/user_wrong_questions', {
+                user_name: 'eq.' + userInfo.name,
+                question_id: 'eq.' + qId
+            });
+            
+            if (existing.length > 0) {
+                // 更新错题记录（增加错误次数）
+                const existingRecord = existing[0];
+                await fetch(API + '/user_wrong_questions?id=eq.' + existingRecord.id, {
+                    method: 'PATCH',
+                    headers: HEADERS,
+                    body: JSON.stringify({
+                        wrong_count: existingRecord.wrong_count + 1,
+                        last_wrong_time: new Date().toISOString()
+                    })
+                });
+            } else {
+                // 新增错题记录
+                await apiPost('/user_wrong_questions', {
+                    user_name: userInfo.name,
+                    question_id: qId,
+                    wrong_count: 1,
+                    last_wrong_time: new Date().toISOString()
+                });
+            }
+        }
+        
+        // 重新加载答题历史
+        await loadData();
+        
         // 显示成绩
         document.getElementById('resScore').textContent = correct + ' / 20';
         const pass = correct >= 16;
@@ -498,6 +583,51 @@
         if (scores.length === 0) { table.innerHTML = ''; empty.style.display = 'block'; return; }
         empty.style.display = 'none';
         table.innerHTML = scores.map(s => '<tr><td>' + s.date + '</td><td>' + s.time + '</td><td><strong>' + s.score + '</strong>/20</td><td>' + Math.round(s.score/20*100) + '%</td></tr>').join('');
+    }
+
+    // ==================== 错题本 ====================
+    async function renderWrongQuestions() {
+        if (!userInfo || userInfo.name === 'admin') {
+            document.getElementById('wrongList').innerHTML = '<p style="color:#999;text-align:center;padding:20px;">管理员无需错题本</p>';
+            document.getElementById('wrongEmpty').style.display = 'none';
+            return;
+        }
+        
+        // 获取错题记录
+        const wrongRecords = await apiGet('/user_wrong_questions', {
+            select: '*',
+            user_name: 'eq.' + userInfo.name,
+            order: 'wrong_count.desc'
+        });
+        
+        const list = document.getElementById('wrongList');
+        const empty = document.getElementById('wrongEmpty');
+        
+        if (wrongRecords.length === 0) {
+            list.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        
+        empty.style.display = 'none';
+        
+        // 获取题目详情
+        let html = '';
+        for (let record of wrongRecords) {
+            const q = allQuestions.find(q => q.id === record.question_id);
+            if (q) {
+                html += '<div class="review review-wrong">' +
+                    '<div class="review-header">' +
+                        '<span class="review-q">错误次数：' + record.wrong_count + ' 次</span>' +
+                        '<span>最后错误：' + (record.last_wrong_time || '').substring(0, 10) + '</span>' +
+                    '</div>' +
+                    '<div class="review-text">' + q.question_text + '</div>' +
+                    '<div class="review-correct-ans">正确答案：' + q.correct_answer + '</div>' +
+                    (q.rationale ? '<div class="review-explain">📖 ' + q.rationale + '</div>' : '') +
+                '</div>';
+            }
+        }
+        list.innerHTML = html;
     }
 
     // ==================== 管理后台 - 题库 ====================
