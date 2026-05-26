@@ -10,66 +10,63 @@
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
         .header { background: #051C2C; color: white; padding: 30px 20px; text-align: center; border-radius: 10px 10px 0 0; }
         .header h1 { font-size: 24px; margin-bottom: 10px; }
-        .header p { font-size: 14px; opacity: 0.8; }
-        .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .info-form { margin-bottom: 30px; }
-        .info-form label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .info-form input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; font-size: 16px; }
-        .question { margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
-        .question h3 { font-size: 16px; margin-bottom: 15px; color: #051C2C; }
-        .options label { display: block; padding: 10px; margin-bottom: 8px; background: white; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; }
-        .options label:hover { background: #f0f7ff; }
-        .options input[type="radio"] { margin-right: 10px; }
-        .fill-answer { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
-        .btn { display: inline-block; padding: 15px 40px; background: #051C2C; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; text-align: center; }
-        .btn:hover { background: #0a3a5c; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { background: white; padding: 30px 20px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        .question { margin-bottom: 25px; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+        .question h3 { margin-bottom: 12px; font-size: 16px; }
+        .options { display: flex; flex-direction: column; gap: 8px; }
+        .option { padding: 10px; background: white; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; transition: all 0.2s; }
+        .option:hover { background: #f0f7ff; }
+        .option.selected { background: #006BA6; color: white; border-color: #006BA6; }
+        .btn { display: block; width: 100%; padding: 15px; background: #006BA6; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px; }
+        .btn:hover { background: #004d80; }
         .result { text-align: center; padding: 30px; }
-        .score { font-size: 48px; font-weight: bold; color: #051C2C; margin: 20px 0; }
-        .pass { color: #007A53; }
-        .fail { color: #C62828; }
-        .analysis { margin-top: 20px; text-align: left; }
-        .analysis .correct { background: #e8f5e9; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
-        .analysis .wrong { background: #ffebee; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .result h2 { font-size: 28px; margin-bottom: 20px; }
+        .score { font-size: 48px; font-weight: bold; color: #006BA6; margin: 20px 0; }
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
         .hidden { display: none; }
-        .progress { text-align: center; margin-bottom: 20px; color: #666; }
+        .explanation { margin-top: 10px; padding: 10px; background: #e8f5e9; border-radius: 5px; font-size: 14px; }
+        .review { margin-top: 20px; text-align: left; }
+        .review-item { padding: 10px; margin-bottom: 10px; border-left: 3px solid #006BA6; background: #f9f9f9; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>SMP-PM-025-04 停产管理程序</h1>
-            <p>培训考试（满分 100 分，及格线 80 分）</p>
+            <h1>SMP-PM-025-04 停产管理程序 培训考试</h1>
+            <p>共 25 题 | 满分 100 分 | 及格线 80 分</p>
         </div>
         <div class="content">
-            <div id="infoSection" class="info-form">
-                <h2 style="margin-bottom: 20px; color: #051C2C;">考生信息</h2>
-                <label>姓名：</label>
-                <input type="text" id="nameInput" placeholder="请输入您的姓名">
-                <label>部门：</label>
-                <input type="text" id="deptInput" placeholder="请输入您的部门">
+            <div id="infoSection">
+                <h2 style="margin-bottom: 20px;">考生信息</h2>
+                <div class="form-group">
+                    <label>姓名：</label>
+                    <input type="text" id="nameInput" placeholder="请输入您的姓名">
+                </div>
+                <div class="form-group">
+                    <label>部门：</label>
+                    <input type="text" id="deptInput" placeholder="请输入您的部门">
+                </div>
                 <button class="btn" onclick="startQuiz()">开始答题</button>
             </div>
-            
             <div id="quizSection" class="hidden">
-                <div class="progress" id="progress"></div>
                 <div id="questionsContainer"></div>
-                <div style="text-align: center; margin-top: 30px;">
-                    <button class="btn" onclick="submitQuiz()">提交答案</button>
-                </div>
+                <button class="btn" onclick="submitQuiz()">提交答案</button>
             </div>
-            
             <div id="resultSection" class="hidden">
                 <div class="result">
-                    <h2>考试结果</h2>
+                    <h2>考试成绩</h2>
                     <div class="score" id="scoreDisplay"></div>
-                    <p id="passStatus"></p>
-                    <div class="analysis" id="analysisContainer"></div>
-                    <button class="btn" onclick="location.reload()" style="margin-top: 20px;">重新考试</button>
+                    <div id="passStatus"></div>
+                    <div class="review" id="reviewSection"></div>
                 </div>
             </div>
         </div>
     </div>
-    
     <script>
         const questions = [{"id": 426, "category": "SMP-PM-025-04 停产管理程序", "question_text": "SMP-PM-025-04《停产管理程序》适用于丽珠集团（宁夏）制药有限公司各产品停产期间（）的管理工作。", "option_a": "仓库", "option_b": "生产车间", "option_c": "质量实验室", "option_d": "办公区域", "correct_answer": "B", "rationale": "见 1.1 范围：适用于各产品停产期间生产车间的管理工作。", "question_type": "choice", "fill_answer": ""}, {"id": 427, "category": "SMP-PM-025-04 停产管理程序", "question_text": "《停产管理程序》中定义的停产是指整厂或整个车间停止生产产品（）以上。", "option_a": "1 个月", "option_b": "2 个月", "option_c": "3 个月", "option_d": "6 个月", "correct_answer": "C", "rationale": "见 4.1 定义：停产是指企业按照生产经营工作安排，整厂或整个车间停止生产产品 3 个月以上。", "question_type": "choice", "fill_answer": ""}, {"id": 428, "category": "SMP-PM-025-04 停产管理程序", "question_text": "负责各品种停产和复产通知以及生产计划下达的部门是（）。", "option_a": "质量保证部", "option_b": "生产管理部", "option_c": "质量控制部", "option_d": "采购部", "correct_answer": "B", "rationale": "见 3.1 职责：生产管理部负责各品种停产和复产通知以及生产计划的下达。", "question_type": "choice", "fill_answer": ""}, {"id": 429, "category": "SMP-PM-025-04 停产管理程序", "question_text": "生产车间收到《停产/复产通知》后，应制定（）并经审批后执行。", "option_a": "生产计划", "option_b": "停产/复产工作计划", "option_c": "清洁计划", "option_d": "培训计划", "correct_answer": "B", "rationale": "见 6.1.1：生产车间做好本车间的《停产/复产工作计划》（APP2-SMP-PM-025）并经部门负责人、生产管理负责人、质量管理负责人审批后执行。", "question_type": "choice", "fill_answer": ""}, {"id": 430, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产通知的发放按照（）执行。", "option_a": "停产管理程序", "option_b": "生产计划管理程序", "option_c": "记录管理程序", "option_d": "洁净区管理程序", "correct_answer": "B", "rationale": "见 6.1.1：停产通知的发放按照《生产计划管理程序》（SMP-PM-002）执行。", "question_type": "choice", "fill_answer": ""}, {"id": 431, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产通知应包含停产车间、批次、预计时长、（）等。", "option_a": "涉及的产品", "option_b": "涉及的人员", "option_c": "涉及的设备", "option_d": "涉及的物料", "correct_answer": "A", "rationale": "见 6.1.2：停产通知应包含停产车间、批次、预计时长、涉及的产品等。", "question_type": "choice", "fill_answer": ""}, {"id": 432, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产前，生产车间将所剩的原辅料和包装材料进行清查盘点，并按照（）操作退回仓库。", "option_a": "物料管理程序", "option_b": "物料退库标准操作规程", "option_c": "仓储管理程序", "option_d": "生产计划管理程序", "correct_answer": "B", "rationale": "见 6.1.5.1：按照《物料退库标准操作规程》（SOP-PM-111）操作退回仓库。", "question_type": "choice", "fill_answer": ""}, {"id": 433, "category": "SMP-PM-025-04 停产管理程序", "question_text": "填写完成的记录，按照（）进行归档。", "option_a": "记录管理程序", "option_b": "停产管理程序", "option_c": "文件管理程序", "option_d": "质量管理程序", "correct_answer": "A", "rationale": "见 6.1.6.2：填写完成的记录，按照《记录管理程序》（SMP-QA-003）进行归档。", "question_type": "choice", "fill_answer": ""}, {"id": 434, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产期间生产车间（）进行清洁，只需在复产前进行全面彻底清洁。", "option_a": "必须每周", "option_b": "必须每月", "option_c": "可不再", "option_d": "必须每天", "correct_answer": "C", "rationale": "见 6.1.7.1：停产期间生产车间可不再进行清洁，只需在复产前进行全面彻底清洁。", "question_type": "choice", "fill_answer": ""}, {"id": 435, "category": "SMP-PM-025-04 停产管理程序", "question_text": "涉及洁净区的生产车间在停产前还须做（）。", "option_a": "设备校验", "option_b": "环境监测", "option_c": "人员培训", "option_d": "物料盘点", "correct_answer": "B", "rationale": "见 6.1.8：涉及洁净区的生产车间在停产前还须做环境监测。", "question_type": "choice", "fill_answer": ""}, {"id": 436, "category": "SMP-PM-025-04 停产管理程序", "question_text": "《停产管理程序》的目的是规范生产车间停产期间的管理，确保停产期间生产车间内人员、设备、设施保持良好状态、卫生情况及各项工作的有序开展。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 2.1 目的。", "question_type": "true_false", "fill_answer": ""}, {"id": 437, "category": "SMP-PM-025-04 停产管理程序", "question_text": "各生产车间负责按照本程序开展停复产准备、实施停复产和停产期间各项工作的执行。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 3.2 职责。", "question_type": "true_false", "fill_answer": ""}, {"id": 438, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产通知只需包含停产车间和批次，不需要包含预计时长。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "错误", "rationale": "见 6.1.2：停产通知应包含停产车间、批次、预计时长、涉及的产品等。", "question_type": "true_false", "fill_answer": ""}, {"id": 439, "category": "SMP-PM-025-04 停产管理程序", "question_text": "生产车间停产后，人员可不再对设备进行日常及月度维保，但必须做好年度维保。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 6.1.4.3。", "question_type": "true_false", "fill_answer": ""}, {"id": 440, "category": "SMP-PM-025-04 停产管理程序", "question_text": "生产车间停产后，仪器仪表也不再需要进行校验。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 6.1.4.3：仪器仪表也可不再进行校验。", "question_type": "true_false", "fill_answer": ""}, {"id": 441, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产期间，生产车间必须每周进行一次日常清洁并做好记录。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "错误", "rationale": "见 6.1.7.1：停产期间生产车间可不再进行清洁，只需在复产前进行全面彻底清洁。", "question_type": "true_false", "fill_answer": ""}, {"id": 442, "category": "SMP-PM-025-04 停产管理程序", "question_text": "人员重新上岗时必须进行岗位相关操作文件的培训，培训合格后方可上岗。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 6.2.1.1。", "question_type": "true_false", "fill_answer": ""}, {"id": 443, "category": "SMP-PM-025-04 停产管理程序", "question_text": "复产前需确认设备、清洁方法、工艺及分析方法等均处于验证/确认状态。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 6.2.1.3。", "question_type": "true_false", "fill_answer": ""}, {"id": 444, "category": "SMP-PM-025-04 停产管理程序", "question_text": "复产前不需要确认相关文件是否为现行版文件。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "错误", "rationale": "见 6.2.1.5：确认相关文件为现行版文件。", "question_type": "true_false", "fill_answer": ""}, {"id": 445, "category": "SMP-PM-025-04 停产管理程序", "question_text": "《停产/复产通知》的编号是 APP1-SMP-PM-025。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "正确", "rationale": "见 7.1 附属资料。", "question_type": "true_false", "fill_answer": ""}, {"id": 446, "category": "SMP-PM-025-04 停产管理程序", "question_text": "停产是指企业按照本单位生产经营工作的安排，整厂或整个车间停止生产产品____个月以上。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "3", "rationale": "见 4.1 定义。", "question_type": "fill_blank", "fill_answer": "3"}, {"id": 447, "category": "SMP-PM-025-04 停产管理程序", "question_text": "生产车间停产后，人员可不再对设备进行日常及月度维保，但必须做好____维保。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "年度", "rationale": "见 6.1.4.3。", "question_type": "fill_blank", "fill_answer": "年度"}, {"id": 448, "category": "SMP-PM-025-04 停产管理程序", "question_text": "复产前，车间按照《生产清洁、清场管理程序》（SMP-PM-008）进行全面清洁并做好____。", "option_a": "", "option_b": "", "option_c": "", "option_d": "", "correct_answer": "记录", "rationale": "见 6.2.1.6。", "question_type": "fill_blank", "fill_answer": "记录"}, {"id": 449, "category": "SMP-PM-025-04 停产管理程序", "question_text": "《停产/复产工作计划》的编号是（）。", "option_a": "APP1-SMP-PM-025", "option_b": "APP2-SMP-PM-025", "option_c": "QR1-SMP-PM-025", "option_d": "SOP-PM-025", "correct_answer": "B", "rationale": "见 7.2 附属资料：《停产/复产工作计划》APP2-SMP-PM-025。", "question_type": "choice", "fill_answer": ""}, {"id": 450, "category": "SMP-PM-025-04 停产管理程序", "question_text": "《复产前验证情况确认记录》的编号是（）。", "option_a": "APP1-SMP-PM-025", "option_b": "APP2-SMP-PM-025", "option_c": "QR1-SMP-PM-025", "option_d": "SOP-PM-025", "correct_answer": "C", "rationale": "见 8.1 记录：《复产前验证情况确认记录》QR1-SMP-PM-025。", "question_type": "choice", "fill_answer": ""}];
         let userAnswers = {};
@@ -79,64 +76,38 @@
             const name = document.getElementById('nameInput').value.trim();
             const dept = document.getElementById('deptInput').value.trim();
             if (!name || !dept) {
-                alert('请填写姓名和部门');
+                alert('请填写完整的考生信息');
                 return;
             }
-            
             document.getElementById('infoSection').classList.add('hidden');
             document.getElementById('quizSection').classList.remove('hidden');
-            
             renderQuestions();
         }
         
         function renderQuestions() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = '';
-            
             questions.forEach((q, index) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = 'question';
-                qDiv.id = 'question-' + index;
-                
-                let questionHTML = `<h3>${index + 1}. ${q.question_text}</h3>`;
-                
-                if (q.question_type === 'choice') {
-                    questionHTML += '<div class="options">';
-                    const options = [
-                        { label: 'A', value: q.option_a },
-                        { label: 'B', value: q.option_b },
-                        { label: 'C', value: q.option_c },
-                        { label: 'D', value: q.option_d }
-                    ];
-                    options.forEach(opt => {
-                        if (opt.value) {
-                            questionHTML += `
-                                <label>
-                                    <input type="radio" name="q${index}" value="${opt.label}" onchange="saveAnswer(${index}, '${opt.label}')">
-                                    ${opt.label}. ${opt.value}
-                                </label>`;
-                        }
-                    });
-                    questionHTML += '</div>';
-                } else if (q.question_type === 'true_false') {
-                    questionHTML += `
-                        <div class="options">
-                            <label><input type="radio" name="q${index}" value="正确" onchange="saveAnswer(${index}, '正确')"> 正确</label>
-                            <label><input type="radio" name="q${index}" value="错误" onchange="saveAnswer(${index}, '错误')"> 错误</label>
-                        </div>`;
-                } else if (q.question_type === 'fill_blank') {
-                    questionHTML += `<input type="text" class="fill-answer" id="fill-${index}" placeholder="请输入答案" onchange="saveAnswer(${index}, this.value)">`;
-                }
-                
-                qDiv.innerHTML = questionHTML;
+                qDiv.innerHTML = `
+                    <h3>${index + 1}. ${q.question_text}</h3>
+                    <div class="options">
+                        ${q.option_a ? `<div class="option" onclick="selectAnswer(${index}, 'A', this)">A. ${q.option_a}</div>` : ''}
+                        ${q.option_b ? `<div class="option" onclick="selectAnswer(${index}, 'B', this)">B. ${q.option_b}</div>` : ''}
+                        ${q.option_c ? `<div class="option" onclick="selectAnswer(${index}, 'C', this)">C. ${q.option_c}</div>` : ''}
+                        ${q.option_d ? `<div class="option" onclick="selectAnswer(${index}, 'D', this)">D. ${q.option_d}</div>` : ''}
+                    </div>
+                `;
                 container.appendChild(qDiv);
             });
-            
-            document.getElementById('progress').textContent = `共 ${questions.length} 道题`;
         }
         
-        function saveAnswer(index, answer) {
-            userAnswers[index] = answer;
+        function selectAnswer(qIndex, answer, element) {
+            userAnswers[qIndex] = answer;
+            const options = element.parentElement.querySelectorAll('.option');;
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
         }
         
         function submitQuiz() {
@@ -146,14 +117,12 @@
                 }
             }
             
-            // 计算成绩
             let correct = 0;
             const pointPerQuestion = 100 / questions.length;
             
             questions.forEach((q, index) => {
                 const userAnswer = userAnswers[index] || '';
                 const correctAnswer = q.correct_answer;
-                
                 if (userAnswer === correctAnswer) {
                     correct++;
                 }
@@ -161,10 +130,8 @@
             
             score = Math.round(correct * pointPerQuestion);
             
-            // 显示结果
             document.getElementById('quizSection').classList.add('hidden');
             document.getElementById('resultSection').classList.remove('hidden');
-            
             document.getElementById('scoreDisplay').textContent = score + ' 分';
             
             const passStatus = document.getElementById('passStatus');
@@ -174,27 +141,8 @@
                 passStatus.innerHTML = '<span class="fail">✗ 不及格</span>';
             }
             
-            // 显示解析
-            const analysisContainer = document.getElementById('analysisContainer');
-            analysisContainer.innerHTML = '<h3 style="margin-bottom: 15px;">题目解析</h3>';
-            
-            questions.forEach((q, index) => {
-                const userAnswer = userAnswers[index] || '未作答';
-                const correctAnswer = q.correct_answer;
-                const isCorrect = userAnswer === correctAnswer;
-                
-                const div = document.createElement('div');
-                div.className = isCorrect ? 'correct' : 'wrong';
-                div.innerHTML = `
-                    <strong>${index + 1}. ${q.question_text}</strong><br>
-                    你的答案：${userAnswer} | 正确答案：${correctAnswer}<br>
-                    <em>解析：${q.rationale}</em>
-                `;
-                analysisContainer.appendChild(div);
-            });
-            
-            // 保存成绩到 Supabase
             saveScoreToSupabase();
+            showReview();
         }
         
         function saveScoreToSupabase() {
@@ -204,11 +152,11 @@
             const date = now.toISOString().split('T')[0];
             const time = now.toTimeString().split(' ')[0].substring(0, 5);
             
-            fetch('${API}/scores', {
+            fetch('https://jzpqzsaocaukqjlqhnex.supabase.co/rest/v1/scores', {
                 method: 'POST',
                 headers: {
-                    'apikey': '${SUPABASE_KEY}',
-                    'Authorization': 'Bearer ${SUPABASE_KEY}',
+                    'apikey': 'sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E',
+                    'Authorization': 'Bearer sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -226,6 +174,25 @@
             .catch(error => {
                 console.error('保存成绩失败', error);
             });
+        }
+        
+        function showReview() {
+            const reviewSection = document.getElementById('reviewSection');
+            let html = '<h3 style="margin-bottom: 15px;">答题详情</h3>';
+            questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index] || '未作答';
+                const correctAnswer = q.correct_answer;
+                const isCorrect = userAnswer === correctAnswer;
+                html += `
+                    <div class="review-item" style="border-left-color: ${isCorrect ? '#28a745' : '#dc3545'};">
+                        <strong>${index + 1}.</strong> ${q.question_text}<br>
+                        你的答案：<span style="color: ${isCorrect ? '#28a745' : '#dc3545'};">${userAnswer}</span> | 
+                        正确答案：<span style="color: #28a745;">${correctAnswer}</span>
+                        ${q.rationale ? `<div class="explanation">解析：${q.rationale}</div>` : ''}
+                    </div>
+                `;
+            });
+            reviewSection.innerHTML = html;
         }
     </script>
 </body>
