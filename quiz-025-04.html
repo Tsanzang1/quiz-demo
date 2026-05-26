@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMP-PM-025-04 停产管理程序 培训考试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: #051C2C; color: white; padding: 30px 20px; text-align: center; border-radius: 10px 10px 0 0; }
+        .header h1 { font-size: 24px; margin-bottom: 10px; }
+        .header p { font-size: 14px; opacity: 0.8; }
+        .content { background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .info-form { margin-bottom: 30px; }
+        .info-form label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .info-form input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px; font-size: 16px; }
+        .question { margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
+        .question h3 { font-size: 16px; margin-bottom: 15px; color: #051C2C; }
+        .options label { display: block; padding: 10px; margin-bottom: 8px; background: white; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; }
+        .options label:hover { background: #f0f7ff; }
+        .options input[type="radio"] { margin-right: 10px; }
+        .fill-answer { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        .btn { display: inline-block; padding: 15px 40px; background: #051C2C; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; text-align: center; }
+        .btn:hover { background: #0a3a5c; }
+        .result { text-align: center; padding: 30px; }
+        .score { font-size: 48px; font-weight: bold; color: #051C2C; margin: 20px 0; }
+        .pass { color: #007A53; }
+        .fail { color: #C62828; }
+        .analysis { margin-top: 20px; text-align: left; }
+        .analysis .correct { background: #e8f5e9; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .analysis .wrong { background: #ffebee; padding: 15px; border-radius: 5px; margin-bottom: 10px; }
+        .hidden { display: none; }
+        .progress { text-align: center; margin-bottom: 20px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SMP-PM-025-04 停产管理程序</h1>
+            <p>培训考试（满分 100 分，及格线 80 分）</p>
+        </div>
+        <div class="content">
+            <div id="infoSection" class="info-form">
+                <h2 style="margin-bottom: 20px; color: #051C2C;">考生信息</h2>
+                <label>姓名：</label>
+                <input type="text" id="nameInput" placeholder="请输入您的姓名">
+                <label>部门：</label>
+                <input type="text" id="deptInput" placeholder="请输入您的部门">
+                <button class="btn" onclick="startQuiz()">开始答题</button>
+            </div>
+            
+            <div id="quizSection" class="hidden">
+                <div class="progress" id="progress"></div>
+                <div id="questionsContainer"></div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="submitQuiz()">提交答案</button>
+                </div>
+            </div>
+            
+            <div id="resultSection" class="hidden">
+                <div class="result">
+                    <h2>考试结果</h2>
+                    <div class="score" id="scoreDisplay"></div>
+                    <p id="passStatus"></p>
+                    <div class="analysis" id="analysisContainer"></div>
+                    <button class="btn" onclick="location.reload()" style="margin-top: 20px;">重新考试</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const questions = [];
+        let userAnswers = {};
+        let score = 0;
+        
+        function startQuiz() {
+            const name = document.getElementById('nameInput').value.trim();
+            const dept = document.getElementById('deptInput').value.trim();
+            if (!name || !dept) {
+                alert('请填写姓名和部门');
+                return;
+            }
+            
+            document.getElementById('infoSection').classList.add('hidden');
+            document.getElementById('quizSection').classList.remove('hidden');
+            
+            renderQuestions();
+        }
+        
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question';
+                qDiv.id = 'question-' + index;
+                
+                let questionHTML = `<h3>${index + 1}. ${q.question_text}</h3>`;
+                
+                if (q.question_type === 'choice') {
+                    questionHTML += '<div class="options">';
+                    const options = [
+                        { label: 'A', value: q.option_a },
+                        { label: 'B', value: q.option_b },
+                        { label: 'C', value: q.option_c },
+                        { label: 'D', value: q.option_d }
+                    ];
+                    options.forEach(opt => {
+                        if (opt.value) {
+                            questionHTML += `
+                                <label>
+                                    <input type="radio" name="q${index}" value="${opt.label}" onchange="saveAnswer(${index}, '${opt.label}')">
+                                    ${opt.label}. ${opt.value}
+                                </label>`;
+                        }
+                    });
+                    questionHTML += '</div>';
+                } else if (q.question_type === 'true_false') {
+                    questionHTML += `
+                        <div class="options">
+                            <label><input type="radio" name="q${index}" value="正确" onchange="saveAnswer(${index}, '正确')"> 正确</label>
+                            <label><input type="radio" name="q${index}" value="错误" onchange="saveAnswer(${index}, '错误')"> 错误</label>
+                        </div>`;
+                } else if (q.question_type === 'fill_blank') {
+                    questionHTML += `<input type="text" class="fill-answer" id="fill-${index}" placeholder="请输入答案" onchange="saveAnswer(${index}, this.value)">`;
+                }
+                
+                qDiv.innerHTML = questionHTML;
+                container.appendChild(qDiv);
+            });
+            
+            document.getElementById('progress').textContent = `共 ${questions.length} 道题`;
+        }
+        
+        function saveAnswer(index, answer) {
+            userAnswers[index] = answer;
+        }
+        
+        function submitQuiz() {
+            if (Object.keys(userAnswers).length < questions.length) {
+                if (!confirm('还有题目未作答，确定要提交吗？')) {
+                    return;
+                }
+            }
+            
+            // 计算成绩
+            let correct = 0;
+            const pointPerQuestion = 100 / questions.length;
+            
+            questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index] || '';
+                const correctAnswer = q.correct_answer;
+                
+                if (userAnswer === correctAnswer) {
+                    correct++;
+                }
+            });
+            
+            score = Math.round(correct * pointPerQuestion);
+            
+            // 显示结果
+            document.getElementById('quizSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+            
+            document.getElementById('scoreDisplay').textContent = score + ' 分';
+            
+            const passStatus = document.getElementById('passStatus');
+            if (score >= 80) {
+                passStatus.innerHTML = '<span class="pass">✓ 及格</span>';
+            } else {
+                passStatus.innerHTML = '<span class="fail">✗ 不及格</span>';
+            }
+            
+            // 显示解析
+            const analysisContainer = document.getElementById('analysisContainer');
+            analysisContainer.innerHTML = '<h3 style="margin-bottom: 15px;">题目解析</h3>';
+            
+            questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index] || '未作答';
+                const correctAnswer = q.correct_answer;
+                const isCorrect = userAnswer === correctAnswer;
+                
+                const div = document.createElement('div');
+                div.className = isCorrect ? 'correct' : 'wrong';
+                div.innerHTML = `
+                    <strong>${index + 1}. ${q.question_text}</strong><br>
+                    你的答案：${userAnswer} | 正确答案：${correctAnswer}<br>
+                    <em>解析：${q.rationale}</em>
+                `;
+                analysisContainer.appendChild(div);
+            });
+            
+            // 保存成绩到 Supabase
+            saveScoreToSupabase();
+        }
+        
+        function saveScoreToSupabase() {
+            const name = document.getElementById('nameInput').value.trim();
+            const dept = document.getElementById('deptInput').value.trim();
+            const now = new Date();
+            const date = now.toISOString().split('T')[0];
+            const time = now.toTimeString().split(' ')[0].substring(0, 5);
+            
+            fetch('${API}/scores', {
+                method: 'POST',
+                headers: {
+                    'apikey': '${SUPABASE_KEY}',
+                    'Authorization': 'Bearer ${SUPABASE_KEY}',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    dept: dept,
+                    score: score,
+                    date: date,
+                    time: time
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('成绩已保存', data);
+            })
+            .catch(error => {
+                console.error('保存成绩失败', error);
+            });
+        }
+    </script>
+</body>
+</html>
