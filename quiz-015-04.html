@@ -118,13 +118,13 @@
                         }
                     });
                     questionHTML += '</div>';
-                } else if (q.question_type === 'true_false') {
+                } else if (q.question_type === 'judge') {
                     questionHTML += `
                         <div class="options">
                             <label><input type="radio" name="q${index}" value="正确" onchange="saveAnswer(${index}, '正确')"> 正确</label>
                             <label><input type="radio" name="q${index}" value="错误" onchange="saveAnswer(${index}, '错误')"> 错误</label>
                         </div>`;
-                } else if (q.question_type === 'fill_blank') {
+                } else if (q.question_type === 'fill') {
                     questionHTML += `<input type="text" class="fill-answer" id="fill-${index}" placeholder="请输入答案" onchange="saveAnswer(${index}, this.value)">`;
                 }
                 
@@ -204,11 +204,11 @@
             const date = now.toISOString().split('T')[0];
             const time = now.toTimeString().split(' ')[0].substring(0, 5);
             
-            fetch(f'https://jzpqzsaocaukqjlqhnex.supabase.co/rest/v1/scores', {
+            fetch('https://jzpqzsaocaukqjlqhnex.supabase.co/rest/v1/scores', {
                 method: 'POST',
                 headers: {
-                    f'apikey': 'sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E',
-                    f'Authorization': 'Bearer sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E',
+                    'apikey': 'sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E',
+                    'Authorization': 'Bearer sb_publishable_i5wv5ciQWu9rhxjMdBqZpw_Z9C-Om4E',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
