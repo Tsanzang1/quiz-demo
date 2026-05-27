@@ -216,12 +216,12 @@
                     '<div class="option"><label><input type="radio" name="q' + q.id + '" value="C"> C. ' + q.option_c + '</label></div>' +
                     '<div class="option"><label><input type="radio" name="q' + q.id + '" value="D"> D. ' + q.option_d + '</label></div>' +
                 '</div>';
-            } else if (q.question_type === 'true_false') {
+            } else if (q.question_type === 'judge') {
                 html += '<div class="options">' +
                     '<div class="option"><label><input type="radio" name="q' + q.id + '" value="正确"> 正确</label></div>' +
                     '<div class="option"><label><input type="radio" name="q' + q.id + '" value="错误"> 错误</label></div>' +
                 '</div>';
-            } else if (q.question_type === 'fill_blank') {
+            } else if (q.question_type === 'fill') {
                 html += '<div style="padding:10px;">' +
                     '<input type="text" name="q' + q.id + '" placeholder="请输入答案" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;">' +
                 '</div>';
@@ -256,7 +256,7 @@
             let ans = '';
             let ok = false;
             
-            if (q.question_type === 'fill_blank') {
+            if (q.question_type === 'fill') {
                 const input = document.querySelector('input[name="q' + q.id + '"]');
                 if (!input || !input.value.trim()) {
                     btn.disabled = false;
